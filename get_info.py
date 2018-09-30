@@ -33,3 +33,12 @@ def getSizeBox(minx, maxx, miny, maxy, minz, maxz):
     print('\nBox_Length (x) : {}\nBox_Width (y) : {}\nBox_Height (z) : {}\n'.format(length, width, height))
 
     return length, width, height
+
+def middleOfPropeller(minx, maxx, miny, maxy, minz, maxz):
+    xmid = (minx + maxx)/2
+    ymid = (miny + maxy)/2
+    zmid = (minz + maxz)/2
+
+    print('\nx_middle (x) : {}\ny_middle (y) : {}\nz_middle (z) : {}\n'.format(xmid, ymid, zmid))
+
+    return xmid, ymid, zmid
