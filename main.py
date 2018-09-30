@@ -3,19 +3,18 @@ from stl import mesh
 from pca import PCA
 from get_info import getBox, getSizeBox, middleOfPropeller
 
-propellerMesh = mesh.Mesh.from_file('propeller.stl') #fill here 
 
+propellerMesh = mesh.Mesh.from_file('propeller.stl')
 
-# The mesh normals 
-propellerMesh.normals      #liste de vecteur à 3 dimensions
-#print(len(propellerMesh.normals))  #12'980
+#List of array of all points in 3D
+allpoints = [liste for subliste in propellerMesh.vectors for liste in subliste]
+allpoints_array = np.asarray(allpoints)
+#print(allpoints_array)
 
-# The mesh vectors
-propellerMesh.v0, propellerMesh.v1, propellerMesh.v2
-propellerMesh.v0                   #liste de vecteur à 3 dimensions
-#print(len(propellerMesh.v0))      #12980
+eigenvalues, eigenvectors = PCA(allpoints_array)
+main_direction = eigenvectors[0]
+print('Main direction from PCA is {}'.format(main_direction))
 
-#print(propellerMesh.x)
 
 #Get the outer box of the propeller position in file
 minx, maxx, miny, maxy, minz, maxz = getBox(propellerMesh)
@@ -25,14 +24,31 @@ length, width, height = getSizeBox(minx, maxx, miny, maxy, minz, maxz)
 # Should work because propeller is symetrical
 xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
 
+class Blade:
+	"""Class to represent blade of propeller alone"""
+	def __init__(self, X, Y, Z):
+		self.x = X
+		self.y = Y
+		self.z = Z
 
-#List of array of all points in 3D
-allpoints = [liste for subliste in propellerMesh.vectors for liste in subliste]
-allpoints_array = np.asarray(allpoints)
-#print(allpoints_array)
 
-eigenvalues, eigenvectors = PCA(allpoints_array)
-main_direction = eigenvectors[0]
 
-print('Main direction from PCA is {}'.format(main_direction))
+def keepUpperBlade(propellerMesh):
+	minx, maxx, miny, maxy, minz, maxz = getBox(propellerMesh)
+	xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
 
+	zpoints = [point for vect in propellerMesh.z for point in vect if point > zmid]
+	print('z done')
+	xpoints = [point for vect in propellerMesh.x for point in vect if zpoints in propellerMesh.z]
+	print('x done')
+	ypoints = [point for vect in propellerMesh.y for point in vect if zpoints in propellerMesh.z]
+	print('y done')
+
+	upperBlade = Blade(xpoints, ypoints, zpoints)
+
+	return upperBlade
+
+#print(propellerMesh.z)
+upperBlade = keepUpperBlade(propellerMesh)
+
+#print(upperBlade)
