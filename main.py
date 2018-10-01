@@ -22,7 +22,7 @@ length, width, height = getSizeBox(minx, maxx, miny, maxy, minz, maxz)
 
 # Get middle of propeller to only consider one blade
 # Should work because propeller is symetrical
-xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
+#xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
 
 class Blade:
 	"""Class to represent blade of propeller alone"""
@@ -33,22 +33,43 @@ class Blade:
 
 
 
-def keepUpperBlade(propellerMesh):
-	minx, maxx, miny, maxy, minz, maxz = getBox(propellerMesh)
+def keepUpperBlade(propellerMesh, pente):
+	""""Keeps only set of points above z middle"""
+	#minx, maxx, miny, maxy, minz, maxz = getBox(propellerMesh)
 	xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
 
-	zpoints = [point for vect in propellerMesh.z for point in vect if point > zmid]
-	print('z done')
-	xpoints = [point for vect in propellerMesh.x for point in vect if zpoints in propellerMesh.z]
-	print('x done')
-	ypoints = [point for vect in propellerMesh.y for point in vect if zpoints in propellerMesh.z]
-	print('y done')
+	zpoints = []
+	xpoints = []
+	ypoints = []
+	nb = 0
+	for i, vect in enumerate(propellerMesh.z) :
+		for j, point in enumerate(vect) :
+			#Orientation légèrement penchée. 
+			#J'ai un point (xmid, ymid, zmid) et un vecteur (eigen[1])
+			#Donc besoin de equation pour orientation du plan de coupe et condition
+			##Equation de droite: z = mx + c  (m is 2nd_dir)
+			if point >= zmid :   
+				nb = nb + 1
+				zpoints.append(propellerMesh.z[i][j])
+				xpoints.append(propellerMesh.x[i][j])
+				ypoints.append(propellerMesh.y[i][j])
 
 	upperBlade = Blade(xpoints, ypoints, zpoints)
-
+	print('nb :{}'.format(nb))
 	return upperBlade
 
-#print(propellerMesh.z)
-upperBlade = keepUpperBlade(propellerMesh)
+upperBlade = keepUpperBlade(propellerMesh, eigenvectors[1])
 
-print(upperBlade)
+#bladeArray = zip(upperBlade.x, upperBlade.y, upperBlade.x)
+
+print(propellerMesh.x)
+print(len(propellerMesh.x))
+print(len(upperBlade.x))
+
+
+def choppingSegements(blade, cutting_plane):
+	#devrait choisir regulierement les plans de coupe parralèle au eigenvectors 2
+	#les segmentations sont les points entre 2 plans
+	return coordinates
+
+coordinates = choppingSegements(upperBlade, eigenvectors[1])
