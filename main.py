@@ -51,4 +51,4 @@ def keepUpperBlade(propellerMesh):
 #print(propellerMesh.z)
 upperBlade = keepUpperBlade(propellerMesh)
 
-#print(upperBlade)
+print(upperBlade)
