@@ -22,15 +22,18 @@ length, width, height = getSizeBox(minx, maxx, miny, maxy, minz, maxz)
 
 # Get middle of propeller to only consider one blade
 # Should work because propeller is symetrical
-#xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
+xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
 
 class Blade:
 	"""Class to represent blade of propeller alone"""
+	# length = 0
+	# width = 0
+	# height = 0
+
 	def __init__(self, X, Y, Z):
 		self.x = X
 		self.y = Y
 		self.z = Z
-
 
 
 def keepUpperBlade(propellerMesh, pente):
@@ -60,16 +63,33 @@ def keepUpperBlade(propellerMesh, pente):
 
 upperBlade = keepUpperBlade(propellerMesh, eigenvectors[1])
 
-#bladeArray = zip(upperBlade.x, upperBlade.y, upperBlade.x)
+#bladePoints = zip(upperBlade.x, upperBlade.y, upperBlade.z)
+#bladePoints = np.array(len(upperBlade.x), 3)
+########### Je veux que bladePoint soit un tableau
+########### En ligne les points
+########### En colonne [x y z]
 
-print(propellerMesh.x)
-print(len(propellerMesh.x))
-print(len(upperBlade.x))
+#print(propellerMesh.x)
+# print(len(propellerMesh.x))
+# print(len(upperBlade.x))
 
 
-def choppingSegements(blade, cutting_plane):
+def choppingSegments(blade, cutting_plane, maxz, zmid, nbseg):  #cutting plane: direction of cut
 	#devrait choisir regulierement les plans de coupe parralèle au eigenvectors 2
 	#les segmentations sont les points entre 2 plans
-	return coordinates
 
-coordinates = choppingSegements(upperBlade, eigenvectors[1])
+	delta_z = (maxz - zmid)/nbseg
+
+	for i in range(nbseg) : 
+		#on prend l'ancien transposé de delta_z
+		new_plane = cutting_plane + [0, 0, delta_z]
+
+		#for point in bladePoints:
+		#	if( (point) > cutting_plane and (point) < new_plane):
+		#		seg[i] = Blade(point.x, point.y, point.z)
+
+		cutting_plane = new_plane  
+
+	return #seg
+
+seg = choppingSegments(upperBlade, eigenvectors[1], maxz, zmid, 4)  #eigenvector if want cut in this direction
