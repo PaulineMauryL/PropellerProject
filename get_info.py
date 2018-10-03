@@ -40,5 +40,5 @@ def middleOfPropeller(minx, maxx, miny, maxy, minz, maxz):
     zmid = (minz + maxz)/2
 
     #print('\nx_middle (x) : {}\ny_middle (y) : {}\nz_middle (z) : {}\n'.format(xmid, ymid, zmid))
-
+    
     return xmid, ymid, zmid

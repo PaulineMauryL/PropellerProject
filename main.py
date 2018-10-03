@@ -22,7 +22,8 @@ length, width, height = getSizeBox(minx, maxx, miny, maxy, minz, maxz)
 
 # Get middle of propeller to only consider one blade
 # Should work because propeller is symetrical
-xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
+
+#xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
 
 class Blade:
 	"""Class to represent blade of propeller alone"""
@@ -36,22 +37,38 @@ class Blade:
 		self.z = Z
 
 
-def keepUpperBlade(propellerMesh, pente):
+def keepUpperBlade(propellerMesh, normal):
 	""""Keeps only set of points above z middle"""
 	#minx, maxx, miny, maxy, minz, maxz = getBox(propellerMesh)
 	xmid, ymid, zmid = middleOfPropeller(minx, maxx, miny, maxy, minz, maxz)
+	point_mid = np.asarray([xmid, ymid, zmid])
+	print("point  is {}".format(point_mid))
+
+	normal = np.array(normal)
+	print("normal is {}".format(normal))
 
 	zpoints = []
 	xpoints = []
 	ypoints = []
 	nb = 0
+	#Orientation légèrement penchée. 
+	#J'ai un point (xmid, ymid, zmid) et le vecteur normal (eigen[0] = (a, b, c))
+	#Donc besoin de equation pour orientation du plan de coupe et condition
+	##Equation de droite: a*xmid + b*ymid + c*zmid + d = 0 
+
+	d = - np.dot(point_mid,normal)
+	print("d is {}".format(d))
+
+	plan = np.append(normal,d)
+	#print("plan is {}".format(plan))
+	print("plan is {}".format(plan))
+	
+	print("vectors is {}".format(propellerMesh.vectors))
+	
 	for i, vect in enumerate(propellerMesh.z) :
 		for j, point in enumerate(vect) :
-			#Orientation légèrement penchée. 
-			#J'ai un point (xmid, ymid, zmid) et un vecteur (eigen[1])
-			#Donc besoin de equation pour orientation du plan de coupe et condition
-			##Equation de droite: z = mx + c  (m is 2nd_dir)
-			if point >= zmid :   
+
+			if point >= point_mid[2] :   
 				nb = nb + 1
 				zpoints.append(propellerMesh.z[i][j])
 				xpoints.append(propellerMesh.x[i][j])
@@ -61,7 +78,7 @@ def keepUpperBlade(propellerMesh, pente):
 	print('nb :{}'.format(nb))
 	return upperBlade
 
-upperBlade = keepUpperBlade(propellerMesh, eigenvectors[1])
+upperBlade = keepUpperBlade(propellerMesh, eigenvectors[0])
 
 #bladePoints = zip(upperBlade.x, upperBlade.y, upperBlade.z)
 #bladePoints = np.array(len(upperBlade.x), 3)
@@ -74,22 +91,22 @@ upperBlade = keepUpperBlade(propellerMesh, eigenvectors[1])
 # print(len(upperBlade.x))
 
 
-def choppingSegments(blade, cutting_plane, maxz, zmid, nbseg):  #cutting plane: direction of cut
-	#devrait choisir regulierement les plans de coupe parralèle au eigenvectors 2
-	#les segmentations sont les points entre 2 plans
+# def choppingSegments(blade, cutting_plane, maxz, zmid, nbseg):  #cutting plane: direction of cut
+# 	#devrait choisir regulierement les plans de coupe parralèle au eigenvectors 2
+# 	#les segmentations sont les points entre 2 plans
 
-	delta_z = (maxz - zmid)/nbseg
+# 	delta_z = (maxz - zmid)/nbseg
 
-	for i in range(nbseg) : 
-		#on prend l'ancien transposé de delta_z
-		new_plane = cutting_plane + [0, 0, delta_z]
+# 	for i in range(nbseg) : 
+# 		#on prend l'ancien transposé de delta_z
+# 		new_plane = cutting_plane + [0, 0, delta_z]
 
-		#for point in bladePoints:
-		#	if( (point) > cutting_plane and (point) < new_plane):
-		#		seg[i] = Blade(point.x, point.y, point.z)
+# 		#for point in bladePoints:
+# 		#	if( (point) > cutting_plane and (point) < new_plane):
+# 		#		seg[i] = Blade(point.x, point.y, point.z)
 
-		cutting_plane = new_plane  
+# 		cutting_plane = new_plane  
 
-	return #seg
+# 	return #seg
 
-seg = choppingSegments(upperBlade, eigenvectors[1], maxz, zmid, 4)  #eigenvector if want cut in this direction
+# seg = choppingSegments(upperBlade, eigenvectors[0], maxz, zmid, 4)  #eigenvector if want cut in this direction
