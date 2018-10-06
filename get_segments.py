@@ -1,81 +1,42 @@
 import numpy as np 
 import pandas as pd
 
-#keep one blade
+
+def blade_alone(propeller_coords, vect_upper, middle_point, dmiddle):
+    upper = []
+    lower = []
+    for index, point in propeller_coords.iterrows():
+        if(point @ vect_upper + dmiddle > 0):
+            upper.append(index)
+        else:
+            lower.append(index)
+    upper_blade = propeller_coords.iloc[upper].copy()
+    lower_blade = propeller_coords.iloc[lower].copy()
+    
+    return upper_blade, lower_blade
 
 
-def segment(allpoints_array, normal, nb_segments):
-	""""Get the segments of the blade"""
-
-	#print("normal is {}".format(normal))
-
-	index_max_z = np.argmax(allpoints_array[:,2])
-	#zmax = np.max(allpoints_array[:,2])
-	index_min_z = np.argmin(allpoints_array[:,2])
-	#zmin = np.min(allpoints_array[:,2])
-	#print("Max z is {}".format( np.max(allpoints_array[:,2]) ) )
-	#print("Min z is {}".format( np.min(allpoints_array[:,2]) ) )
-	point_max = allpoints_array[index_max_z,:]
-	point_min = allpoints_array[index_min_z,:]
-
-	dmax = - point_max @ normal
-	dmin = - point_min @ normal
-
-	delta_d = (dmax - dmin)/nb_segments
-	print("Delta d is {}".format(delta_d))
-
-	last_plane = np.append(normal,dmin)
-	print("Equation of last plan is {}".format(last_plane))
-
-	new_plane[:] = last_plane[:]
-
-	array_to_compare = allpoints_array[:]
-
-	for i in range(nb_segments):
-		new_plane[:] = last_plane[:] + [0, 0, 0, delta_d]
-		print("Equation of new plan is {}".format(new_plane))
-
-		segment_list = pd.DataFrame()
-		point_in_segment = []
-		index_to_remove = []
-		###je veux mettre les points de chaque segments ensemble (liste ? classe ? dataframe ?)
-
-		for j, elem in enumerate(array_to_compare):
-			elem_mult = np.append(elem, 1)  #ajoute 1 pour d*1 (vecteur x y z 1) ou alors direct ajou
-			if(elem_mult @ last_plane > 0 and elem_mult @ new_plane < 0)
-				point_in_segment.append(elem_mult)
-				index_to_remove.append(j)
-				
-				#il n'y aura pas forcement le meme nombre de point dans chaque
-
-		######### remove elem from array_to_compare
-		segment_list[j] = point_in_segment
-
-		last_plane = new_plane[:]
-
-		return segment_list #tout les segments avec leur points à chacun
-
-def getBlade(allpoints_array, normal, point_mid):
-	""""Get one blade of propeller"""
-
-	d = - point_mid @ normal
-	#print("d is {}".format(d))
-
-	index_max_z = np.argmax(allpoints_array[:,2])
-	#zmax = np.max(allpoints_array[:,2])
-	index_min_z = np.argmin(allpoints_array[:,2])
-	#zmin = np.min(allpoints_array[:,2])
-	#print("Max z is {}".format( np.max(allpoints_array[:,2]) ) )
-	#print("Min z is {}".format( np.min(allpoints_array[:,2]) ) )
-	point_max = allpoints_array[index_max_z,:]
-	point_min = allpoints_array[index_min_z,:]
-
-
-	for i, elem in allpoints_array:
-		elem_mult = np.append(elem, 1)  #ajoute 1 pour d*1 (vecteur x y z 1)
-		if(elem_mult @ plane > 0)
-			point_upper_blade.append(elem_mult)
-		else :
-			pont_lower_blade.append(elem_mult)
-		
-		return #upperblade and lowerblade
+def get_segments(blade, dmiddle, d_max, vect, nb_seg):
+    delta_d = (d_max - dmiddle)/nb_seg
+    
+    last_plane = np.append(vect, dmiddle)
+    
+    #new_plane = np.array([0,0,0,0])
+    segments = {}
+    segments["points"] = []
+    
+    for i in range(nb_seg):
+        index_segment = []
+        new_plane = last_plane[:] + [0,0,0,delta_d]
+        
+        for index, point in blade.iterrows():
+            point_mult = np.append(point, 1)         
+            if(point_mult @ last_plane > 0 and point_mult @ new_plane < 0):
+                index_segment.append(index)
+        
+        last_plane = new_plane
+        
+        segments["points"].append(blade.loc[index_segment].copy().as_matrix())
+        
+    return segments
+    
