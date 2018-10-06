@@ -13,6 +13,9 @@ vect_upper, vect_lower, dmiddle, dmax, dmin = blade_info(max_point, min_point, m
 
 upper_blade, lower_blade = blade_alone(propeller_coords, vect_upper, middle_point, dmiddle)
 
+#plot_pointcloud(propeller_coords)
+plot_eigenvectors(propeller_coords, vect_upper)
+'''
 segments = get_segments(upper_blade, dmiddle, dmax, vect_upper, 4)
 
 #plot_pointcloud(propeller_coords)
@@ -20,4 +23,4 @@ segments = get_segments(upper_blade, dmiddle, dmax, vect_upper, 4)
 for i, array in enumerate(segments["points"]):
     print(i)
     print(array)
-    
+'''

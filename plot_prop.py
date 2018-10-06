@@ -34,21 +34,21 @@ def plot_eigenvectors(propeller_coords, vect_upper):
 	ax.plot([np.mean(propeller_coords["X"])], [np.mean(propeller_coords["Y"])], [np.mean(propeller_coords["Z"])],
 	        'o', markersize=10, color='red', alpha=0.5)
 
-	a = Arrow3D([np.mean(propeller_coords["X"]), np.mean(propeller_coords["X"]) - vect_upper[0]], 
-            [np.mean(propeller_coords["Y"]), np.mean(propeller_coords["Y"]) - vect_upper[1]], 
-            [np.mean(propeller_coords["Z"]), np.mean(propeller_coords["Z"]) - vect_upper[2]], 
+	a = Arrow3D([np.mean(propeller_coords["X"]), np.mean(propeller_coords["X"]) + vect_upper[0]], 
+            [np.mean(propeller_coords["Y"]), np.mean(propeller_coords["Y"]) + vect_upper[1]], 
+            [np.mean(propeller_coords["Z"]), np.mean(propeller_coords["Z"]) + vect_upper[2]], 
             mutation_scale=20, lw=3, arrowstyle="-|>", color="r")
 	ax.add_artist(a)
 
-	ax.set_xlabel('x_values')
-	ax.set_ylabel('y_values')
-	ax.set_zlabel('z_values')
+	ax.set_xlabel('x_values', fontsize=15)
+	ax.set_ylabel('y_values', fontsize=15)
+	ax.set_zlabel('z_values', fontsize=15)
 
 	ax.set_xlim([downlim, uplim]);
 	ax.set_ylim([downlim, uplim]);
 	ax.set_zlim([downlim, uplim]);
 
-	plt.title('Main direction')
+	plt.title('Main direction', fontsize=20)
 
 	plt.show()
 
@@ -64,14 +64,15 @@ def plot_pointcloud(propeller_coords):
 	ax.plot([np.mean(propeller_coords["X"])], [np.mean(propeller_coords["Y"])], [np.mean(propeller_coords["Z"])],
 	        'o', markersize=10, color='red', alpha=0.5)
 
-	ax.set_xlabel('x_values')
-	ax.set_ylabel('y_values')
-	ax.set_zlabel('z_values')
+	ax.set_xlabel('x_values', fontsize=15)
+	ax.set_ylabel('y_values', fontsize=15)
+	ax.set_zlabel('z_values', fontsize=15)
+
 
 	ax.set_xlim([downlim, uplim]);
 	ax.set_ylim([downlim, uplim]);
 	ax.set_zlim([downlim, uplim]);
 
-	plt.title('Point cloud')
+	plt.title('Point cloud of propeller', fontsize=20)
 
 	plt.show()
