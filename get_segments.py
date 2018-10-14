@@ -16,8 +16,8 @@ def blade_alone(propeller_coords, vect_upper, middle_point, dmiddle):
     return upper_blade, lower_blade
 
 
-def get_planes(blade, dmiddle, d_max, vect, nb_seg):
-	delta_d = (d_max - dmiddle)/nb_seg
+def get_planes(blade, dmiddle, d_highest, vect, nb_seg):
+	delta_d = (d_highest - dmiddle)/nb_seg
 	last_plane = np.append(vect, dmiddle)
 	planes = [last_plane]
 
@@ -30,9 +30,11 @@ def get_planes(blade, dmiddle, d_max, vect, nb_seg):
 
 
 
-def get_segments(blade, planes, nb_seg):
+def get_segments_points(blade, planes, nb_seg):
 	segments = {}
 	segments["points"] = []
+
+	nb_seg = len(planes) - 1
 
 	for i in range(nb_seg):
 		index_segment = []
@@ -45,12 +47,8 @@ def get_segments(blade, planes, nb_seg):
         
 		segments["points"].append(blade.loc[index_segment].copy().as_matrix())
 
-	for index, point in blade.iterrows():
-		point_mult = np.append(point, 1)
-
-		if(point_mult @ planes[nb_seg] > 0):
-			index_segment.append(index) 
-			
-	segments["points"].append(blade.loc[index_segment].copy().as_matrix())
-	
 	return segments
+
+
+
+
