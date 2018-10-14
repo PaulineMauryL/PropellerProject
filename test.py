@@ -1,8 +1,8 @@
-from plot_prop import plot_direction, plot_pointcloud, plot_segments, plot_projection
+from plot_prop import plot_direction, plot_pointcloud, plot_segments, plot_projection, plot_all_projections
 from prop_info import extreme_points, vect_blade, d_blade
 from get_segments import blade_alone, get_segments_points, get_planes
 from major_axis import get_major_axis
-from projections import project_on_plane
+from projections import all_projections
 import pandas as pd
 import numpy as np
 
@@ -28,10 +28,17 @@ planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
 
 segments = get_segments_points(upper_blade, planes, nb_seg)
 
-nb_point = 500
+nb_point = 1000
 plan = planes[2]
 segment_down = segments['points'][1]
 segment_up = segments['points'][2]
-df_d, df_u = project_on_plane(plan, segment_down, segment_up, nb_point)
-plot_projection(df_u, df_d)
+#df_d, df_u = project_on_plane(plan, segment_down, segment_up, nb_point)
+#plot_projection(df_u, df_d)
+
+
+
+proj_up, proj_down = all_projections(nb_seg, planes, segments, nb_point)
+
+plot_all_projections(proj_up, proj_down)
+
 

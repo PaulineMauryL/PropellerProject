@@ -151,3 +151,17 @@ def plot_projection(df_u, df_d):
     ax.set_zlabel('z_values', fontsize=15)
     plt.title('Projection on plane', fontsize=20)
     plt.show()
+
+
+def plot_all_projections(proj_up, proj_down):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    for elem in proj_down:
+        ax.plot(proj_down[elem]["X"], proj_down[elem]["Y"], proj_down[elem]["Z"], 'go', markersize=3, alpha=0.2)
+    for elem in proj_up:
+        ax.plot(proj_up[elem]["X"], proj_up[elem]["Y"], proj_up[elem]["Z"], 'ro', markersize=3, alpha=0.2)
+    ax.set_xlabel('x_values', fontsize=15)
+    ax.set_ylabel('y_values', fontsize=15)
+    ax.set_zlabel('z_values', fontsize=15)
+    plt.title('Projections on plane', fontsize=20)
+    plt.show()

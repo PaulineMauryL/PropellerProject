@@ -24,8 +24,8 @@ def findMinMaxDF(data):
     return min_df, max_df
 
 def normalize_vec(vect):
-	L = math.sqrt( sum([x**2 for x in vect]) )
-	return [x/L for x in vect]
+    L = math.sqrt( sum([x**2 for x in vect]) )
+    return [x/L for x in vect]
 
 def distance_point_plane(point, plane):
     return abs(point[0]*plane[0] + point[1]*plane[1] + point[2]*plane[2] + plane[3])
