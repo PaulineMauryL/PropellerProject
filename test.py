@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 
 # read dataframe
-propeller_coords = pd.read_csv('propeller_data.csv')
+propeller_coords = pd.read_csv('aerostar_data.csv')
 
 max_point, min_point, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
 
@@ -20,25 +20,30 @@ upper_blade, lower_blade = blade_alone(propeller_coords, vect_length, middle_poi
 vect_out, vect_side = get_major_axis(propeller_coords, middle_point, vect_length)
 
 
-#plot_direction(propeller_coords, vect_blade, vect_out, vect_side)
-#plot_pointcloud(lower_blade)
+plot_direction(propeller_coords, vect_length, vect_out, vect_side)
+#plot_pointcloud(propeller_coords)
 #plot_eigenvectors(propeller_coords, vect_upper)
+
+
 nb_seg = 5
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
 
 segments = get_segments_points(upper_blade, planes, nb_seg)
 
 nb_point = 1000
-plan = planes[2]
-segment_down = segments['points'][1]
-segment_up = segments['points'][2]
-#df_d, df_u = project_on_plane(plan, segment_down, segment_up, nb_point)
-#plot_projection(df_u, df_d)
-
-
 
 proj_up, proj_down = all_projections(nb_seg, planes, segments, nb_point)
 
-plot_all_projections(proj_up, proj_down)
+plot_projection(proj_up[2], proj_down[2])
+
+#dans un vrai fichier scanné, bcp plus de points donc si petit range et moyenne 
+#moyenne entre haut et bas avec poids fct distance âu plan
+	#--> bonne approximation 
+		#--> non car connait pas les couples 
+			#--> plus proche du coup donc peut être que si
+
+
+#plot_all_projections(proj_up, proj_down)
+
 
 

@@ -149,6 +149,13 @@ def plot_projection(df_u, df_d):
     ax.set_xlabel('x_values', fontsize=15)
     ax.set_ylabel('y_values', fontsize=15)
     ax.set_zlabel('z_values', fontsize=15)
+
+    downlim, uplim = findMinMaxDF(df_u)
+
+    ax.set_xlim([downlim, uplim]);
+    ax.set_ylim([downlim, uplim]);
+    ax.set_zlim([downlim, uplim]);
+
     plt.title('Projection on plane', fontsize=20)
     plt.show()
 
