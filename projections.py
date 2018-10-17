@@ -10,8 +10,8 @@ def all_projections(nb_seg, planes, segments, nb_point):
 
     for proj in range(1, nb_seg):
         df_d, df_u = project_on_plane(planes[proj], segments['points'][proj-1], segments['points'][proj], nb_point)
-        proj_down[proj] = df_d
-        proj_up[proj] = df_u
+        proj_down[proj-1] = df_d
+        proj_up[proj-1] = df_u
     
     return proj_up, proj_down
 
@@ -50,3 +50,29 @@ def project_on_plane(plan, segment_down, segment_up, nb_point):
     df_u.columns = ['X', 'Y','Z']
     
     return df_d, df_u
+
+def find_closest_couple_plane(proj_down, proj_up):
+    couple = []
+    d = np.zeros([proj_down.shape[0],proj_up.shape[0]])
+    
+    for i, x1 in proj_down.iterrows():
+        for j, x2 in proj_up.iterrows():
+            d[i][j] = distance_p2p(x1, x2)
+            
+    min_down = np.argmin(d, axis=0)
+    min_up = np.argmin(d, axis=1)
+
+    for i in range(proj_down[2].shape[0]):
+        value = min_down[i]
+        #print("i is {}".format(i))
+        #print("value is {}".format(value))
+        if(min_up[value]==i):
+            #print("min_up[value] is {}".format(min_up[value]))
+            couple.append((i,value))
+            
+    return couple
+
+def couple_all_planes(proj_down, proj_up):
+    for proj in range(1, nb_seg):
+        couple[proj] = find_closest_couple_plane(proj_down[proj], proj_up[proj])
+    return couple
