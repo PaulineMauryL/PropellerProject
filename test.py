@@ -3,7 +3,7 @@ from prop_info import extreme_points, vect_blade, d_blade
 from get_segments import blade_alone, get_segments_points, get_planes
 from major_axis import get_major_axis
 #from projections import couple_all_planes, project_all_couples, points_to_project, projections_by_side
-from parameters import get_hub_points, find_hub_radius
+from parameters import get_hub_points, get_hub_radius
 from plot_param import plot_hub
 
 import pandas as pd
@@ -44,6 +44,9 @@ plot_final_projections(projections_df)
 
 hub_points = get_hub_points(propeller_coords, dmiddle, vect_length)
 
-point_outer_radius, point_inner_radius = find_hub_radius(middle_point, hub_inner_radius, vect_side, hub_points)
+hub_outer_radius, hub_inner_radius = get_hub_radius(hub_points, middle_point, vect_side, hub_inner_radius)
 
-plot_hub(propeller_coords, hub_points, point_outer_radius, point_inner_radius)
+hub_radius = hub_outer_radius - middle_point  #from center to exterior radius
+hub_radius_norm = np.linalg.norm(hub_radius)
+
+plot_hub(propeller_coords, hub_points, hub_outer_radius, hub_inner_radius)
