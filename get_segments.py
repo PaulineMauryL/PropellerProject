@@ -49,6 +49,3 @@ def get_segments_points(blade, planes, nb_seg):
 
 	return segments
 
-
-
-

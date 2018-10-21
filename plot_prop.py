@@ -175,15 +175,3 @@ def plot_all_projections(proj_up, proj_down):
     plt.title('Projections on plane', fontsize=20)
     plt.show()
     
-    
-    
-def plot_final_projections(projections):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    for elem in projections:
-        ax.plot(projections[elem][0], projections[elem][1], projections[elem][2], 'go', markersize=3, alpha=0.2)
-    ax.set_xlabel('x_values', fontsize=15)
-    ax.set_ylabel('y_values', fontsize=15)
-    ax.set_zlabel('z_values', fontsize=15)
-    plt.title('Projections on plane', fontsize=20)
-    plt.show()

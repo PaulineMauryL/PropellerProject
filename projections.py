@@ -91,9 +91,13 @@ def project_couple(couple, plane, proj_up_i, proj_down_i):
 
 
 def project_all_couples(couples, planes, proj_up, proj_down):
-
+    plan_df = {}
     projections = []
+    
     for i, couple in enumerate(couples):
         projections.append( project_couple(couple, planes[i+1], proj_up[i], proj_down[i]) )
-
-    return projections
+        
+    for i, plan in enumerate(projections):
+        plan_df[i] = pd.DataFrame(plan, index = False)
+        
+    return plan_df
