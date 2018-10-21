@@ -141,7 +141,9 @@ def plot_segments(segments):
 
 	plt.show()
 
-def plot_projection(df_u, df_d):
+    
+    
+def plot_projection_up_down(df_u, df_d):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.plot(df_d["X"], df_d["Y"], df_d["Z"], 'co', markersize=3, alpha=0.2)
@@ -172,3 +174,4 @@ def plot_all_projections(proj_up, proj_down):
     ax.set_zlabel('z_values', fontsize=15)
     plt.title('Projections on plane', fontsize=20)
     plt.show()
+    
