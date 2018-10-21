@@ -82,6 +82,7 @@ def couple_all_planes(proj_down, proj_up, nb_seg):
     #print("couple all plane \n \n \n")
     couples = []
     for proj in range(nb_seg-1):
+        print(proj)
         couples.append( find_closest_couple_plane(proj_down[proj], proj_up[proj]) )
     return couples
 

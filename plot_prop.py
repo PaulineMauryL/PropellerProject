@@ -175,3 +175,21 @@ def plot_all_projections(proj_up, proj_down):
     plt.title('Projections on plane', fontsize=20)
     plt.show()
     
+    
+
+def plot_final_projections(projections_df):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    i = 0
+    for plan in projections_df["points"]:
+        #print(plan)
+        ax.plot(plan['X'], plan['Y'], plan['Z'], 'x', markersize=4, alpha=0.8, label = "Plan" + str(i))
+        i = i + 1
+    ax.set_xlabel('x_values', fontsize=15)
+    ax.set_ylabel('y_values', fontsize=15)
+    ax.set_zlabel('z_values', fontsize=15)
+    plt.title('Projections on plane', fontsize=20)
+    plt.legend()
+    plt.show()
+    fig.savefig('Projections_on_plane.png')
+    
