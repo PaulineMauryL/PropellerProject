@@ -2,7 +2,10 @@ from plot_prop import plot_direction, plot_pointcloud, plot_segments, plot_all_p
 from prop_info import extreme_points, vect_blade, d_blade
 from get_segments import blade_alone, get_segments_points, get_planes
 from major_axis import get_major_axis
-from projections import couple_all_planes, project_all_couples, points_to_project, projections_by_side
+#from projections import couple_all_planes, project_all_couples, points_to_project, projections_by_side
+from parameters import get_hub_points, find_hub_radius
+from plot_param import plot_hub
+
 import pandas as pd
 import numpy as np
 
@@ -17,13 +20,13 @@ dmiddle, dhighest, dlowest = d_blade(vect_length, middle_point, highest_point, l
 
 upper_blade, lower_blade = blade_alone(propeller_coords, vect_length, dmiddle)
 
-vect_out, vect_side = get_major_axis(propeller_coords, middle_point, vect_length)
-
+vect_out, vect_side, hub_inner_radius = get_major_axis(propeller_coords, middle_point, vect_length)
+print("Finish pre-processing")
 #plot_direction(propeller_coords, vect_length, vect_out, vect_side)
 #plot_pointcloud(propeller_coords)
 #plot_eigenvectors(propeller_coords, vect_upper)
 
-##Projection part
+## Projection part
 '''
 nb_seg = 5
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
@@ -33,6 +36,14 @@ proj_up, proj_down, idx_up, idx_down = projections_by_side(nb_seg, planes, segme
 couples = couple_all_planes(proj_down, proj_up, nb_seg)
 down, up = points_to_project(segments, idx_up, idx_down, couples, nb_seg)
 projections_df = project_all_couples(couples, planes, up, down)
+#print("Finished projections")
 plot_final_projections(projections_df)
 '''
 
+## Parameters part
+
+hub_points = get_hub_points(propeller_coords, dmiddle, vect_length)
+
+point_outer_radius, point_inner_radius = find_hub_radius(middle_point, hub_inner_radius, vect_side, hub_points)
+
+plot_hub(propeller_coords, hub_points, point_outer_radius, point_inner_radius)
