@@ -2,18 +2,21 @@ import numpy as np
 import pandas as pd
 
 
-def blade_alone(propeller_coords, vect_upper, middle_point, dmiddle):
+def blade_alone(propeller_coords, vect_upper, dmiddle):
     upper = []
     lower = []
+    
     for index, point in propeller_coords.iterrows():
-        if(point @ vect_upper + dmiddle > 0):
+        if(point.values @ np.array(vect_upper) + dmiddle > 0):
             upper.append(index)
         else:
             lower.append(index)
+            
     upper_blade = propeller_coords.iloc[upper].copy()
     lower_blade = propeller_coords.iloc[lower].copy()
     
     return upper_blade, lower_blade
+
 
 
 def get_planes(blade, dmiddle, d_highest, vect, nb_seg):

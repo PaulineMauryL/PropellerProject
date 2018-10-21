@@ -72,7 +72,7 @@ def find_closest_couple_plane(proj_down, proj_up):
             
     return couple
 
-def couple_all_planes(proj_down, proj_up):
+def couple_all_planes(proj_down, proj_up, nb_seg):
     for proj in range(1, nb_seg):
         couple[proj] = find_closest_couple_plane(proj_down[proj], proj_up[proj])
     return couple
