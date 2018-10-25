@@ -27,7 +27,7 @@ print("Finish pre-processing")
 #plot_eigenvectors(propeller_coords, vect_upper)
 
 ## Projection part
-'''
+
 nb_seg = 5
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
 segments = get_segments_points(upper_blade, planes, nb_seg)
@@ -38,10 +38,10 @@ down, up = points_to_project(segments, idx_up, idx_down, couples, nb_seg)
 projections_df = project_all_couples(couples, planes, up, down)
 #print("Finished projections")
 plot_final_projections(projections_df)
-'''
+
 
 ## Parameters part
-
+'''
 hub_points = get_hub_points(propeller_coords, dmiddle, vect_length)
 
 hub_outer_radius, hub_inner_radius = get_hub_radius(hub_points, middle_point, vect_side, hub_inner_radius)
@@ -50,3 +50,4 @@ hub_radius = hub_outer_radius - middle_point  #from center to exterior radius
 hub_radius_norm = np.linalg.norm(hub_radius)
 
 plot_hub(propeller_coords, hub_points, hub_outer_radius, hub_inner_radius)
+'''
