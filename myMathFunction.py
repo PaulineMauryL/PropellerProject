@@ -38,7 +38,7 @@ def distance_point_plane(point, plane):
 
 
 def distance_p2p(x1, x2):
-    return math.sqrt( (x2[0] - x1[0])**2 + (x2[1] - x1[1])**2 + (x2[2] - x2[2])**2 )
+    return math.sqrt( (x2[0] - x1[0])**2 + (x2[1] - x1[1])**2 + (x2[2] - x1[2])**2 )
 
 
 
@@ -54,9 +54,10 @@ def point_on_plane(x1, x2, plane):
     vec = x1 - x2
     
     t = - (plane[0]*x1[0] + plane[1]*x1[1] + plane[2]*x1[2] + plane[3]) / (plane[0]*vec[0] + plane[1]*vec[1] + plane[2]*vec[2])
-    
+    #t = - plane[3] / (plane[0]*vec[0] + plane[1]*vec[1] + plane[2]*vec[2])
+
     x = x1[0] + t*vec[0]
     y = x1[1] + t*vec[1]
     z = x1[2] + t*vec[2]
     
-    return np.asarray([x, y, z])
+    return np.asarray([x, y, z]),

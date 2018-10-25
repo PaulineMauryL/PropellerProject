@@ -8,19 +8,19 @@ def projections_by_side(nb_seg, planes, segments, nb_point):
     proj_down = []
     proj_up = []
     
-    idx_up = []
-    idx_down = []
+    points_up = []
+    points_down = []
 
     for proj in range(1, nb_seg): #1,2,3,4
-        df_d, df_u, idx_down_proj, idx_up_proj = project_on_plane(planes[proj], segments['points'][proj-1], segments['points'][proj], nb_point)
-        print(proj)
+        df_d, df_u, point_down, point_up = project_on_plane(planes[proj], segments['points'][proj-1], segments['points'][proj], nb_point)
+        #print(proj)
         proj_down.append(df_d)
         proj_up.append(df_u)
         
-        idx_down.append(idx_down_proj) #0,1,2,3
-        idx_up.append(idx_up_proj)
+        points_down.append(point_down) #0,1,2,3
+        points_up.append(point_up)
         
-    return proj_up, proj_down, idx_up, idx_down
+    return proj_up, proj_down, points_down, points_up
 
 
 def project_on_plane(plan, segment_down, segment_up, nb_point):
@@ -50,18 +50,17 @@ def project_on_plane(plan, segment_down, segment_up, nb_point):
         pp_d.append(project_point(p, plan))
     for p in point_up:
         pp_u.append(project_point(p, plan))
-        
-    df_d = pd.DataFrame(pp_d)
-    df_d.columns = ['X', 'Y','Z']
-    df_u = pd.DataFrame(pp_u)
-    df_u.columns = ['X', 'Y','Z']
     
-    return df_d, df_u, sort_idx_down, sort_idx_up
+    labels = ['X', 'Y', 'Z']
+
+    df_d = pd.DataFrame(pp_d, columns = labels)
+    df_u = pd.DataFrame(pp_u, columns = labels)
+    
+    return df_d, df_u, point_down, point_up
 
 
 
 def find_closest_couple_plane(proj_down, proj_up):
-    couple = []
     down = []
     up = []
     
@@ -80,51 +79,57 @@ def find_closest_couple_plane(proj_down, proj_up):
         #print("value is {}".format(value))
         if(min_up[value]==i):
             #print("min_up[value] is {}".format(min_up[value]))
-            couple.append((i,value))
+            #couple.append((i,value))
             down.append(proj_down.iloc[i])
+            #down.append(proj_down.iloc[value])
             up.append(proj_up.iloc[value])
-            
-    return couple, down, up
+            #up.append(proj_up.iloc[i])   
+    return down, up
 
 
 
 def couple_all_planes(proj_down, proj_up, nb_seg):
     #print("couple all plane \n \n \n")
-    couples = []
+    #couples = []
     down = []
     up = []
     
     for proj in range(nb_seg-1):
         #print(proj)
-        couple, down_proj, up_proj = find_closest_couple_plane(proj_down[proj], proj_up[proj])
-        couples.append(couple)
+        down_proj, up_proj = find_closest_couple_plane(proj_down[proj], proj_up[proj])
+        
+        #couples.append(couple)
         down.append(down_proj)
         up.append(up_proj)
-    return couples, down, up
+        
+    return down, up
 
 
-def project_couple(plane, proj_up, proj_down): 
+def project_couple(plane, up, down): 
     projection = []
-    for i in range(len(proj_up)):
-        projection.append( point_on_plane( proj_up[i], proj_down[i], plane ) )
+    for i in range(len(up)):
+        projection.append( point_on_plane(up[i], down[i], plane) )
         
     return projection
 
 
-def project_all_couples(couples, planes, up, down):
-    projections_df = {}
-    projections_df['points'] = []
+def project_all_couples(planes, up, down):
     
     projections = []
-    labels = ['X', 'Y', 'Z']
-    
-    for i, couple in enumerate(couples):
+    for i in range(len(up)):
         projections.append( project_couple(planes[i+1], up[i], down[i]) )
-        
-    for i, plan in enumerate(projections):
-        projections_df['points'].append( pd.DataFrame(plan, columns = labels) )
+
+    print(len(projections))
+
+    projections_df = []
+    labels = ['X', 'Y', 'Z']
+    for i, pt in enumerate(projections):
+        print(i)
+        projections_df.append( pd.DataFrame(pt, columns = labels) )
         
     return projections_df
+
+
 
 def points_to_project(segments, idx_up, idx_down, couples, nb_seg):
     up_keep = []
