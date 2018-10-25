@@ -1,8 +1,8 @@
-from plot_prop import plot_direction, plot_pointcloud, plot_segments, plot_all_projections
+from plot_projections import plot_all_projections, plot_final_projections, plot_point_for_couple
 from prop_info import extreme_points, vect_blade, d_blade
 from get_segments import blade_alone, get_segments_points, get_planes
 from major_axis import get_major_axis
-#from projections import couple_all_planes, project_all_couples, points_to_project, projections_by_side
+from projections import couple_all_planes, project_all_couples, projections_by_side, project_couple
 from parameters import get_hub_points, get_hub_radius
 from plot_param import plot_hub
 
@@ -10,7 +10,14 @@ import pandas as pd
 import numpy as np
 
 # read dataframe
-propeller_coords = pd.read_csv('aerostar_data.csv')
+
+print("Begin pre-processing")
+propeller = pd.read_csv('aerostar_data.csv')
+
+propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)
+propeller_coords = propeller_coords.reset_index(drop=True)
+print(propeller_coords.shape)
+
 
 max_point, min_point, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
 
@@ -28,16 +35,43 @@ print("Finish pre-processing")
 
 ## Projection part
 
-nb_seg = 5
+
+print("Begin projections")
+
+nb_seg = 3
+
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
+
 segments = get_segments_points(upper_blade, planes, nb_seg)
-nb_point = 500
-proj_up, proj_down, idx_up, idx_down = projections_by_side(nb_seg, planes, segments, nb_point)
-couples = couple_all_planes(proj_down, proj_up, nb_seg)
-down, up = points_to_project(segments, idx_up, idx_down, couples, nb_seg)
-projections_df = project_all_couples(couples, planes, up, down)
-#print("Finished projections")
+
+nb_point = 200
+proj_up, proj_down, point_down, point_up = projections_by_side(nb_seg, planes, segments, nb_point)
+
+#plot_all_projections(proj_up, proj_down)
+
+#plot_point_for_couple(point_up, point_down)
+
+down, up = couple_all_planes(proj_down, proj_up, nb_seg)
+
+#plot_point_for_couple(up, up)
+#plot_point_for_couple(down, down)
+
+
+projections_df = project_all_couples(planes, up, down)
+
 plot_final_projections(projections_df)
+'''
+couples, down, up = couple_all_planes(proj_down, proj_up, nb_seg)
+
+projections_df = project_all_couples(couples, planes, up, down)
+
+plot_final_projections(projections_df)
+<<<<<<< HEAD
+
+
+=======
+'''
+print("Finish projection")
 
 
 ## Parameters part
