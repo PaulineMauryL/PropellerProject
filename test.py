@@ -33,9 +33,13 @@ print("Finish pre-processing")
 #plot_pointcloud(propeller_coords)
 #plot_eigenvectors(propeller_coords, vect_upper)
 
+## Projection part
+
+
 print("Begin projections")
 
 nb_seg = 3
+
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
 
 segments = get_segments_points(upper_blade, planes, nb_seg)
@@ -62,8 +66,13 @@ couples, down, up = couple_all_planes(proj_down, proj_up, nb_seg)
 projections_df = project_all_couples(couples, planes, up, down)
 
 plot_final_projections(projections_df)
+<<<<<<< HEAD
+
+
+=======
 '''
 print("Finish projection")
+
 
 ## Parameters part
 '''
