@@ -3,12 +3,14 @@ from prop_info import extreme_points, vect_blade, d_blade, center_prop
 from get_segments import blade_alone, get_segments_points, get_planes
 from major_axis import get_major_axis
 #from projections import couple_all_planes, project_all_couples, projections_by_side, project_couple
-from new_projections import assign_points, get_all_points_for_projections, interpolations, find_separation_plane
+from new_projections import assign_points, get_all_points_for_projections, interpolations, find_separation_plane, interpolate_points
 from parameters import get_hub_points, get_hub_radius
 from plot_param import plot_hub
 from plot_prop import plot_pointcloud, plot_direction, plot_segments
 from myMathFunction import least_squares
+from new_projections import model_func
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
@@ -75,64 +77,29 @@ C_dn = find_separation_plane(dn1.values)
 
 
 # 3. Assign point to side
-right_points_up, left_points_up = assign_points(C_up, up1)
-right_points_dn, left_points_dn = assign_points(C_dn, dn1)
-print("right_points_up_shape {}\n".format(right_points_up.shape))
+up_right_points, up_left_points = assign_points(C_up, up1)
+dn_right_points, dn_left_points = assign_points(C_dn, dn1)
+#print("right_points_up_shape {}\n".format(right_points_up.shape))
+#plot_projection_up_down(right_points_up, right_points_up)
 
-plot_projection_up_down(right_points_up, right_points_up)
-'''
 # 4. Interpolate points
-from scipy.optimize import curve_fit
-print(right_points_up)
-print(right_points_up.shape)
-'''
-'''
-def model_func(x, a, b, c, d):    
-    return a*x**3 + b*x**2 + c*x + d
+up_ri_popt = interpolate_points(up_right_points)
+up_le_popt = interpolate_points(up_left_points)
+dn_ri_popt = interpolate_points(dn_right_points)
+dn_le_popt = interpolate_points(dn_left_points)
 
-sigma = np.ones(len(x))
-sigma[[0, -1]] = 0.01
-popt, pcov = curve_fit(model_func, x, y, p0=(0.1 ,1e-3, 0.1), sigma=sigma)
 '''
+def plot_interpolation(up1, popt):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
 
+    plt.plot(np.c_[up1.values[:,0], up1.values[:,1]], model_func(np.c_[up1.values[:,0], up1.values[:,1]], *popt), 'g--')
+    plt.show
+
+plot_interpolation(right_points_up, popt)
+'''
 
 # 5. Projection
-
-
-
-
-'''
-print("X_up\n")
-print(X_up)
-print("Y_up\n")
-print(Y_up)
-print("Z_up\n")
-print(Z_up)
-'''
-
-# plot points and fitted surface
-
-# 2. Least squares approximation
-#w_up_right = least_squares(up_right)
-
-
-
-
-#print(up_right)
-
-#plot_border(up_right, up_left, dn_right, dn_left)
-#proj_up, proj_down, point_down, point_up = projections_by_side(nb_seg, planes, segments, nb_point)
-#plot_projection_up_down(proj_up[1], proj_down[1])
-#plot_all_projections(up, down)
-
-#down, up = couple_all_planes(proj_down, proj_up, nb_seg)
-#plot_point_for_couple(up, up)
-#plot_point_for_couple(down, down)
-#projections_df = project_all_couples(planes, up, down)
-#plot_final_projections(projections_df)
-#couples, down, up = couple_all_planes(proj_down, proj_up, nb_seg)
-#projections_df = project_all_couples(couples, planes, up, down)
-#plot_final_projections(projections_df)
 
 
 print("Finish projection")

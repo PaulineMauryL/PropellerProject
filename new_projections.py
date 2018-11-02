@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 from prop_info import extreme_points
-from plot_projections import plot_least_squares
 import scipy.linalg
+from scipy.optimize import curve_fit
 
 def edges_projection(up, dn, planes):
     '''Project the line of each side'''
@@ -147,12 +147,23 @@ def assign_points(C_up, up):
         else:
             left.append(index)
 
-    right_points = up.loc[right]
-    left_points = up.loc[left]
+    right_points = (up.loc[right]).reset_index(drop=True)
+    left_points = (up.loc[left]).reset_index(drop=True)
 
     return right_points, left_points
 
+def interpolate_points(up1):
+    data = np.c_[up1.values[:,0], up1.values[:,1]]
+    y = up1.values[:,2]
+
+    sigma = np.ones(len(data))
+    sigma[[-1, -2]] = 0.05  #assign more weight to border points
+    popt, pcov = curve_fit(model_func, data, y, sigma=sigma)    
+    return popt
 
 
 def ls_plane(C, X, Y):
     return C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
+
+def model_func(data, a, b, c, d, e, f, g, h):    
+        return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])

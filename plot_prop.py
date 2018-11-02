@@ -79,8 +79,6 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 
 
 
-
-
 def plot_pointcloud(propeller_coords):
 	fig = plt.figure()
 

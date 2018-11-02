@@ -2,6 +2,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import proj3d
 import matplotlib.pyplot as plt
 from myMathFunction import findMinMaxDF
+from new_projections import model_func
 import numpy as np 
 import pandas as pd
 
@@ -115,3 +116,10 @@ def plot_least_squares(X, Y, Z, data):
     plt.legend()
 
     plt.show()
+
+def plot_interpolation(up1, popt):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    plt.plot(np.c_[up1.values[:,0], up1.values[:,1]], model_func(np.c_[up1.values[:,0], up1.values[:,1]], *popt), 'g--',label='fit: a=%5.3f, b=%5.3f, c=%5.3f, d=%5.3f, e=%5.3f, f=%5.3f, g=%5.3f, h=%5.3f' % tuple(popt))
+    plt.show
