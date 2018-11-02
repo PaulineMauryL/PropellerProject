@@ -1,6 +1,27 @@
 import numpy as np
 from myMathFunction import normalize_vec
 
+def center_prop(propeller_coords):
+	midx = np.mean(propeller_coords["X"])
+	midy = np.mean(propeller_coords["Y"])
+	midz = np.mean(propeller_coords["Z"])
+	middle_point = np.asarray([midx, midy, midz])
+
+	propeller_coords = propeller_coords - middle_point
+
+	return propeller_coords
+
+
+def align_prop(propeller_coords):
+	_, _, _, highest_point, _ = extreme_points(propeller_coords)
+
+	angle_phi = get_phi(highest_point)
+	angle_theta = get_theta(highest_point)
+
+	#transformation de chaque point en fonction de sa distance r avec phi et theta
+
+	return propeller_coords
+
 def extreme_points(propeller_coords):
 
     maxx = np.max(propeller_coords["X"])

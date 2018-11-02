@@ -19,6 +19,9 @@ class Arrow3D(FancyArrowPatch):
         self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
         FancyArrowPatch.draw(self, renderer)
 
+
+
+
 def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	#print("plot with blade {}\n out {}\n side{}".format(vect_blade, vect_out, vect_side))
 	vect_blade = [x *100 for x in vect_blade]
@@ -33,7 +36,7 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	#ax.scatter(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"])
 
 	# markersize et alpha contrôlent la taille des points, i.e. le rendering de l'objet
-	ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'o', markersize=3, alpha=0.2)
+	ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'k.', markersize=2, alpha=0.6)
 
 	downlim, uplim = findMinMaxDF(propeller_coords)
 
@@ -59,9 +62,9 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	ax.add_artist(c)		
 
 	#plt.axes().set_aspect('equal')
-	ax.set_xlabel('x_values', fontsize=15)
-	ax.set_ylabel('y_values', fontsize=15)
-	ax.set_zlabel('z_values', fontsize=15)
+	ax.set_xlabel('X', fontsize=20)
+	ax.set_ylabel('Y', fontsize=20)
+	ax.set_zlabel('Z', fontsize=20)
 
 	#plt.axis([0, 100, 0, 50, 0, uplim])
 	
@@ -69,7 +72,7 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	ax.set_ylim([downlim, uplim]);
 	ax.set_zlim([downlim, uplim]);
 
-	plt.title('Main directions', fontsize=20)
+	plt.title('Principal directions of propeller', fontsize=20)
 
 	plt.show()
 
@@ -82,23 +85,23 @@ def plot_pointcloud(propeller_coords):
 	fig = plt.figure()
 
 	ax = fig.add_subplot(111, projection = '3d')
-	ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'o', markersize=3, alpha=0.2)
+	ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'k.', markersize=2, alpha=0.6)
 
 	downlim, uplim = findMinMaxDF(propeller_coords)
 
 	#ax.plot([np.mean(propeller_coords["X"])], [np.mean(propeller_coords["Y"])], [np.mean(propeller_coords["Z"])],
 	#        'o', markersize=10, color='red', alpha=0.5)
 
-	ax.set_xlabel('x_values', fontsize=15)
-	ax.set_ylabel('y_values', fontsize=15)
-	ax.set_zlabel('z_values', fontsize=15)
+	ax.set_xlabel('X', fontsize=20)
+	ax.set_ylabel('Y', fontsize=20)
+	ax.set_zlabel('Z', fontsize=20)
 
 
 	ax.set_xlim([downlim, uplim]);
 	ax.set_ylim([downlim, uplim]);
 	ax.set_zlim([downlim, uplim]);
 
-	plt.title('Point cloud of lower blade', fontsize=20)
+	plt.title('Point cloud propeller', fontsize=20)
 
 	plt.show()
 
@@ -121,23 +124,24 @@ def plot_segments(segments):
 
 	ax = fig.add_subplot(111, projection = '3d')
 
-	ax.plot(seg_df_0["X"], seg_df_0["Y"], seg_df_0["Z"], 'co', markersize=2, alpha=0.2)
-	ax.plot(seg_df_1["X"], seg_df_1["Y"], seg_df_1["Z"], 'bo', markersize=2, alpha=0.2)
-	ax.plot(seg_df_2["X"], seg_df_2["Y"], seg_df_2["Z"], 'go', markersize=2, alpha=0.2)
-	ax.plot(seg_df_3["X"], seg_df_3["Y"], seg_df_3["Z"], 'ro', markersize=2, alpha=0.2)
-	ax.plot(seg_df_4["X"], seg_df_4["Y"], seg_df_4["Z"], 'mo', markersize=2, alpha=0.2)
+	ax.plot(seg_df_0["X"], seg_df_0["Y"], seg_df_0["Z"], 'k.', markersize=4, alpha=0.6, label = "Points of segment 0")
+	ax.plot(seg_df_1["X"], seg_df_1["Y"], seg_df_1["Z"], 'b.', markersize=4, alpha=0.6, label = "Points of segment 1")
+	ax.plot(seg_df_2["X"], seg_df_2["Y"], seg_df_2["Z"], 'g.', markersize=4, alpha=0.6, label = "Points of segment 2")
+	ax.plot(seg_df_3["X"], seg_df_3["Y"], seg_df_3["Z"], 'r.', markersize=4, alpha=0.6, label = "Points of segment 3")
+	ax.plot(seg_df_4["X"], seg_df_4["Y"], seg_df_4["Z"], 'm.', markersize=4, alpha=0.6, label = "Points of segment 4")
 
 	downlim, uplim = findMinMaxDF(seg_df_0)
 
-	ax.set_xlabel('x_values', fontsize=15)
-	ax.set_ylabel('y_values', fontsize=15)
-	ax.set_zlabel('z_values', fontsize=15)
+	ax.set_xlabel('X', fontsize=20)
+	ax.set_ylabel('Y', fontsize=20)
+	ax.set_zlabel('Z', fontsize=20)
 
 	ax.set_xlim([downlim, uplim]);
 	ax.set_ylim([downlim, uplim]);
-	ax.set_zlim([downlim, uplim]);
+	ax.set_zlim([downlim+50, uplim+50]);
 
-	plt.title('Segment', fontsize=20)
+	plt.title('Segments of points between planes', fontsize=20)
+	plt.legend(loc=5)#, prop={'size':8})
 
 	plt.show()
 

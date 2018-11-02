@@ -61,3 +61,9 @@ def point_on_plane(x1, x2, plane):
     z = x1[2] + t*vec[2]
     
     return np.asarray([x, y, z]),
+
+def least_squares(y, tx):
+    """calculate the least squares solution."""
+    a = tx.T.dot(tx)
+    b = tx.T.dot(y)
+    return np.linalg.solve(a, b)
