@@ -83,10 +83,10 @@ dn_right_points, dn_left_points = assign_points(C_dn, dn1)
 #plot_projection_up_down(right_points_up, right_points_up)
 
 # 4. Interpolate points
-up_ri_popt = interpolate_points(up_right_points)
-up_le_popt = interpolate_points(up_left_points)
-dn_ri_popt = interpolate_points(dn_right_points)
-dn_le_popt = interpolate_points(dn_left_points)
+up_right_popt = interpolate_points(up_right_points)
+up_left_popt = interpolate_points(up_left_points)
+dn_right_popt = interpolate_points(dn_right_points)
+dn_left_popt = interpolate_points(dn_left_points)
 
 '''
 def plot_interpolation(up1, popt):
@@ -95,8 +95,7 @@ def plot_interpolation(up1, popt):
 
     plt.plot(np.c_[up1.values[:,0], up1.values[:,1]], model_func(np.c_[up1.values[:,0], up1.values[:,1]], *popt), 'g--')
     plt.show
-
-plot_interpolation(right_points_up, popt)
+plot_interpolation(up_right_points, up_right_popt)
 '''
 
 # 5. Projection
