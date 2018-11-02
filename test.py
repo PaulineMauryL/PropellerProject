@@ -79,6 +79,7 @@ right_points_up, left_points_up = assign_points(C_up, up1)
 right_points_dn, left_points_dn = assign_points(C_dn, dn1)
 print("right_points_up_shape {}\n".format(right_points_up.shape))
 
+plot_projection_up_down(right_points_up, right_points_up)
 '''
 # 4. Interpolate points
 from scipy.optimize import curve_fit

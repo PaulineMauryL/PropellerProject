@@ -141,8 +141,8 @@ def assign_points(C_up, up):
     C = C_up[0:4]
 
     for index, point in up.iterrows():
-        point_mult = np.append(point, 1)
-        if(point_mult @ C >= 0):
+        z = ls_plane(C_up, point[0], point[1])
+        if(z <= point[2]):
             right.append(index)
         else:
             left.append(index)
@@ -151,3 +151,8 @@ def assign_points(C_up, up):
     left_points = up.loc[left]
 
     return right_points, left_points
+
+
+
+def ls_plane(C, X, Y):
+    return C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]

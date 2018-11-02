@@ -28,18 +28,18 @@ def plot_projection_up_down(df_u, df_d):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.plot(df_d["X"], df_d["Y"], df_d["Z"], 'k.', markersize=3, alpha=0.6)
-    ax.plot(df_u["X"], df_u["Y"], df_u["Z"], 'r.', markersize=3, alpha=0.6)
+    ax.plot(df_u["X"], df_u["Y"], df_u["Z"], 'k.', markersize=3, alpha=0.6)
 
     ax.set_xlabel('X', fontsize=20)
     ax.set_ylabel('Y', fontsize=20)
     ax.set_zlabel('Z', fontsize=20)
 
     downlim, uplim = findMinMaxDF(df_u)
-
+    '''
     ax.set_xlim([0, 40]);
     ax.set_ylim([-20, 20]);
     ax.set_zlim([110, 150]);
-
+    '''
     plt.title('Projection on plane', fontsize=20)
     plt.show()
 
@@ -100,7 +100,7 @@ def plot_final_projections(projections_df):
 def plot_least_squares(X, Y, Z, data):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    
+
     ax.plot_surface(X, Y, Z, rstride=1, cstride=1, alpha=0.6)
     ax.scatter(data[:,0], data[:,1], data[:,2], c='k', s=10)
 
