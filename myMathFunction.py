@@ -60,7 +60,7 @@ def point_on_plane(x1, x2, plane):
     y = x1[1] + t*vec[1]
     z = x1[2] + t*vec[2]
     
-    return np.asarray([x, y, z]),
+    return np.asarray([x, y, z])
 
 def least_squares(y, tx):
     """calculate the least squares solution."""
@@ -69,5 +69,3 @@ def least_squares(y, tx):
     return np.linalg.solve(a, b)
 
 
-def model_func(data, a, b, c, d, e, f, g, h):    
-        return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])

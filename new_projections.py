@@ -37,23 +37,6 @@ def interpolation_edge(up):
     return interp_line
 
 
-'''
-def find_border_points(projection):
-    #Find point at the border of the given points
-    right = []
-    left = []
-
-    for elem in projection: 
-        max_point, min_point, _, _, _ = extreme_points(elem)
-
-        right.append(max_point)
-        left.append(min_point)
-
-    return right, left
-'''
-
-
-
 
 
 def get_all_points_for_projections(planes, segments, nb_seg, resolution):
@@ -111,13 +94,10 @@ def find_separation_plane(data):
         # best-fit linear plane
         A = np.c_[data[:,0], data[:,1], np.ones(data.shape[0])]
         C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])    # coefficients
-        
         # evaluate it on grid
-        Z = C[0]*X + C[1]*Y + C[2]
-        
+        Z = C[0]*X + C[1]*Y + C[2]    
         # or expressed using matrix/vector product
         #Z = np.dot(np.c_[XX, YY, np.ones(XX.shape)], C).reshape(X.shape)
-
     elif order == 2:
         # best-fit quadratic curve
         A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
@@ -129,16 +109,12 @@ def find_separation_plane(data):
         Z = C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
         #print("Z\n")
         #print(Z)
-
     #plot_least_squares(X, Y, Z, data)
-
     return C
 
 def assign_points(C_up, up):
     right = []
     left = []
-    
-    C = C_up[0:4]
 
     for index, point in up.iterrows():
         z = ls_plane(C_up, point[0], point[1])
@@ -154,16 +130,41 @@ def assign_points(C_up, up):
 
 def interpolate_points(up1):
     data = np.c_[up1.values[:,0], up1.values[:,1]]
-    y = up1.values[:,2]
+    z = up1.values[:,2]
 
     sigma = np.ones(len(data))
     sigma[[-1, -2]] = 0.05  #assign more weight to border points
-    popt, pcov = curve_fit(model_func, data, y, sigma=sigma)    
+    popt, pcov = curve_fit(model_func, data, z, sigma=sigma)    
     return popt
 
 
 def ls_plane(C, X, Y):
     return C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
 
-def model_func(data, a, b, c, d, e, f, g, h):    
-        return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])
+def model_func(data, a, b, c):    
+        #return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])
+    return a*(data[:,0]**3) + b*(data[:,1]**3) + c * np.ones([data[:,0].shape[0],])
+
+def points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt):
+    up_right = []
+    range_X_up_r = np.linspace(up_right_border[0], up_left_border[0], nb_points)
+    range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], nb_points)
+    
+    interpolated_pts = np.zeros((len(range_X_up_r), 3))
+
+    #for x in range_X_up_r:
+    #    for y in range_Y_up_r:
+    data = np.c_[range_X_up_r, range_Y_up_r]
+    z = model_func(data, *up_right_popt)
+
+    interpolated_pts[:, 0] = range_X_up_r
+    interpolated_pts[:, 1] = range_Y_up_r
+    interpolated_pts[:, 2] = z
+    
+    return interpolated_pts #np.asarray([range_X_up_r, range_Y_up_r, z])  #TO DO: retourner tableaux nb_points * 3. Zip ?
+
+
+#projections = proj_right
+#projections.extend(proj_left)
+#labels = ['X', 'Y', 'Z']
+#pd.DataFrame(projections, columns = labels)
