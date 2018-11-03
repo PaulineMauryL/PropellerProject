@@ -29,7 +29,7 @@ def plot_projection_up_down(df_u, df_d):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.plot(df_d["X"], df_d["Y"], df_d["Z"], 'k.', markersize=3, alpha=0.6)
-    ax.plot(df_u["X"], df_u["Y"], df_u["Z"], 'k.', markersize=3, alpha=0.6)
+    ax.plot(df_u["X"], df_u["Y"], df_u["Z"], 'r.', markersize=3, alpha=0.6)
 
     ax.set_xlabel('X', fontsize=20)
     ax.set_ylabel('Y', fontsize=20)
@@ -117,9 +117,15 @@ def plot_least_squares(X, Y, Z, data):
 
     plt.show()
 
-def plot_interpolation(up1, popt):
+
+def plot_interpolation_side(up_right_border, up_left_border, popt, i):  
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-
-    plt.plot(np.c_[up1.values[:,0], up1.values[:,1]], model_func(np.c_[up1.values[:,0], up1.values[:,1]], *popt), 'g--',label='fit: a=%5.3f, b=%5.3f, c=%5.3f, d=%5.3f, e=%5.3f, f=%5.3f, g=%5.3f, h=%5.3f' % tuple(popt))
-    plt.show
+    range_X_up_r = np.linspace(up_right_border[0], up_left_border[0], 100)
+    range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], 100)
+    
+    data = np.c_[range_X_up_r, range_Y_up_r]
+    z = model_func(data, *popt)
+    plt.plot(range_X_up_r, range_Y_up_r, z, 'k')
+    plt.title(i)
+    plt.show()
