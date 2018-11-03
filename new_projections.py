@@ -168,7 +168,7 @@ def ls_plane(C, X, Y):
 def model_func(data, a, b, c, d, e, f, g, h):    
         return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])
 
-def points_from_curve(up_right_border, up_left_border, nb_points):
+def points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt):
     up_right = []
     range_X_up_r = np.linspace(up_right_border[0], up_left_border[0], nb_points)
     range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], nb_points)
@@ -178,4 +178,4 @@ def points_from_curve(up_right_border, up_left_border, nb_points):
     data = np.c_[range_X_up_r, range_Y_up_r]
     z = model_func(data, *up_right_popt)
     
-    return np.asarray([range_X_up_r, range_Y_up_r, z])
+    return np.asarray([range_X_up_r, range_Y_up_r, z])  #TO DO: retourner tableaux nb_points * 3. Zip ?
