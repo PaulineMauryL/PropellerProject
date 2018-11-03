@@ -110,8 +110,19 @@ def plot_interpolation_side(up_right_border, up_left_border, popt):
 plot_interpolation_side(up_side1_border, up_side2_border, up_right_popt)
 
 # 5. Projection
+up_right_pts = points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt)
+dn_right_pts = points_from_curve(dn_right_border, dn_left_border, nb_points, dn_right_popt)
 
+up_left_pts = points_from_curve(up_right_border, up_left_border, nb_points, up_left_popt) 
+dn_left_pts = points_from_curve(dn_right_border, dn_left_border, nb_points, dn_left_popt)
 
+# Projection de la ligne reliant 2 points sur le plan
+proj_right = []
+proj_left = []
+for i in range(0, up_right_pts.shape[0]):
+    proj_right.append(point_on_plane(up_right_pts[i], dn_right_pts[i], plan1))
+    proj_left.append(point_on_plane(up_left_pts[i], dn_left_pts[i], plan1))
+    
 print("Finish projection")
 
 

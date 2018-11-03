@@ -133,7 +133,7 @@ def interpolate_points(up1):
     z = up1.values[:,2]
 
     sigma = np.ones(len(data))
-    sigma[[-1, -2]] = 0.05  #assign more weight to border points
+    sigma[[-1, -2]] = 0.1  #assign more weight to border points
     popt, pcov = curve_fit(model_func, data, z, sigma=sigma)    
     return popt
 
