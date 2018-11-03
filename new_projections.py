@@ -147,23 +147,29 @@ def model_func(data, a, b, c, d, e, f, g, h):
     return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])
     #return a*(data[:,0]**3) + b*(data[:,1]**3) + c * np.ones([data[:,0].shape[0],])
 
-def points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt):
-    up_right = []
+def points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt, dn_right_popt):
+
     range_X_up_r = np.linspace(up_right_border[0], up_left_border[0], nb_points)
     range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], nb_points)
     
-    interpolated_pts = np.zeros((len(range_X_up_r), 3))
+    interpolated_pts_up = np.zeros((len(range_X_up_r), 3))
+    interpolated_pts_dn = np.zeros((len(range_X_up_r), 3))
 
     #for x in range_X_up_r:
     #    for y in range_Y_up_r:
     data = np.c_[range_X_up_r, range_Y_up_r]
-    z = model_func(data, *up_right_popt)
+    z_up = model_func(data, *up_right_popt)
+    z_dn = model_func(data, *dn_right_popt)
 
-    interpolated_pts[:, 0] = range_X_up_r
-    interpolated_pts[:, 1] = range_Y_up_r
-    interpolated_pts[:, 2] = z
-    
-    return interpolated_pts #np.asarray([range_X_up_r, range_Y_up_r, z])  #TO DO: retourner tableaux nb_points * 3. Zip ?
+    interpolated_pts_up[:, 0] = range_X_up_r
+    interpolated_pts_up[:, 1] = range_Y_up_r
+    interpolated_pts_up[:, 2] = z_up
+
+    interpolated_pts_dn[:, 0] = range_X_up_r
+    interpolated_pts_dn[:, 1] = range_Y_up_r
+    interpolated_pts_dn[:, 2] = z_dn   
+
+    return interpolated_pts_up, interpolated_pts_dn #np.asarray([range_X_up_r, range_Y_up_r, z])  #TO DO: retourner tableaux nb_points * 3. Zip ?
 
 
 #projections = proj_right
@@ -178,12 +184,13 @@ def project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts
     
     for i in range(0, up_right_pts.shape[0]):
         proj_right.append(point_on_plane(up_right_pts[i], dn_right_pts[i], plan1))
-        proj_left.append(point_on_plane(up_left_pts[i], dn_left_pts[i], plan1))
+        proj_left.append( point_on_plane(up_left_pts[i],  dn_left_pts[i],  plan1))
         
     proj_right_df = pd.DataFrame(proj_right, columns = labels)
-    proj_left_df = pd.DataFrame(proj_left, columns = labels)
+    proj_left_df  = pd.DataFrame(proj_left,  columns = labels)
     
     return proj_right_df, proj_left_df
+
 
 def add_border_points(up_right_points, up_side1_border, up_side2_border):
     up_right_points = up_right_points.append(pd.DataFrame(up_side1_border.reshape(1, 3), columns = ["X","Y","Z"]))

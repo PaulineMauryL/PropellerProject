@@ -107,15 +107,14 @@ plot_interpolation_side(dn_side1_border, dn_side2_border, dn_left_popt, "4")
 nb_points = 100
 
 # 5. Projection
-up_right_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up_right_popt)
-dn_right_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_right_popt)
+pts_up_right, pts_dn_right = points_from_curve(up_side1_border, up_side2_border, nb_points, up_right_popt, dn_right_popt)
 
-up_left_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up_left_popt) 
-dn_left_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_left_popt)
+pts_up_left, pts_dn_left   = points_from_curve(up_side1_border, up_side2_border, nb_points, up_left_popt,  dn_left_popt) 
 
 # Projection de la ligne reliant 2 points sur le plan
-proj_right_df, proj_left_df = project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts, plan1)
+proj_right_df, proj_left_df = project_points_on_plane(pts_up_right, pts_dn_right, pts_up_left, pts_dn_left, plan1)
 plot_projection_up_down(proj_right_df, proj_left_df)
+
 # 6. Interpolation surfacce
 popt_right = interpolate_points(proj_right_df)
 popt_left  = interpolate_points(proj_left_df)
