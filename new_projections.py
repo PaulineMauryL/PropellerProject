@@ -3,6 +3,7 @@ import pandas as pd
 from prop_info import extreme_points
 import scipy.linalg
 from scipy.optimize import curve_fit
+from myMathFunction import point_on_plane
 
 def edges_projection(up, dn, planes):
     '''Project the line of each side'''
@@ -168,3 +169,70 @@ def points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt)
 #projections.extend(proj_left)
 #labels = ['X', 'Y', 'Z']
 #pd.DataFrame(projections, columns = labels)
+
+def project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts, plan1):
+    proj_right = []
+    proj_left = []
+    labels = ['X', 'Y', 'Z']
+    
+    for i in range(0, up_right_pts.shape[0]):
+        proj_right.append(point_on_plane(up_right_pts[i], dn_right_pts[i], plan1))
+        proj_left.append(point_on_plane(up_left_pts[i], dn_left_pts[i], plan1))
+        
+    proj_right_df = pd.DataFrame(proj_right, columns = labels)
+    proj_left_df = pd.DataFrame(proj_left, columns = labels)
+    
+    return proj_right_df, proj_left_df
+
+
+def projection_one_plane(up1, dn1, plan1, nb_points):
+    # 1. Find border points
+    up_side1_border, up_side2_border, _, _, _ = extreme_points(up1)
+    dn_side1_border, dn_side2_border, _, _, _ = extreme_points(dn1)
+    #print("up_right {}\n".format(up_right))
+    
+    # 2. Find separating plane
+    C_up = find_separation_plane(up1.values)
+    C_dn = find_separation_plane(dn1.values)
+    # Z = C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
+    #print("C_up {}\n".format(C_up))
+    
+    # 3. Assign point to side  (do it for both sides on both sides)
+    up_right_points, up_left_points = assign_points(C_up, up1)
+    dn_right_points, dn_left_points = assign_points(C_dn, dn1)
+    #print("right_points_up_shape {}\n".format(up_right_points.shape))
+    
+    # Add border points to fit
+    up_right_points = up_right_points.append(pd.DataFrame(up_side1_border.reshape(1, 3), columns = ["X","Y","Z"]))
+    up_right_points = up_right_points.append(pd.DataFrame(up_side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
+    #print("up_right_points_shape {}\n".format(up_right_points.shape))
+    
+    # 4. Interpolate points
+    up_right_popt = interpolate_points(up_right_points)
+    up_left_popt = interpolate_points(up_left_points)
+    
+    dn_right_popt = interpolate_points(dn_right_points)
+    dn_left_popt = interpolate_points(dn_left_points)
+    
+    # 5. Final projection # Take points on each side
+    up_right_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up_right_popt)
+    dn_right_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_right_popt)
+
+    up_left_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up_left_popt) 
+    dn_left_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_left_popt)
+    
+    # Projection de la ligne reliant 2 points sur le plan
+    proj_right_df, proj_left_df = project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts, plan1)
+    
+    # 6. Interpolation surfacce
+    popt_right = interpolate_points(proj_right_df)
+    right_projection_points = points_from_curve(up_side1_border, up_side2_border, nb_points, popt_right)
+    
+    popt_left = interpolate_points(proj_left_df)
+    left_projection_points = points_from_curve(up_side1_border, up_side2_border, nb_points, popt_left)
+    
+    labels = ['X', 'Y', 'Z']
+    right_projection_points_df = pd.DataFrame(right_projection_points, columns = labels)
+    left_projection_points_df = pd.DataFrame(left_projection_points, columns = labels)
+
+    return popt_right, popt_left, right_projection_points_df, left_projection_points_df
