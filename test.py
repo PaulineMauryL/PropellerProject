@@ -64,23 +64,31 @@ up, down = get_all_points_for_projections(planes, segments, nb_seg, resolution)
 ### DO for one plane here, then will do for all
 up1 = up[0]
 dn1 = down[0]
+plan1 = planes[0]
+#print(up1.shape)
 
 # 1. Find border points
-up_right, up_left, _, _, _ = extreme_points(up1)
-dn_right, dn_left, _, _, _ = extreme_points(dn1)
+up_side1_border, up_side2_border, _, _, _ = extreme_points(up1)
+dn_side1_border, dn_side2_border, _, _, _ = extreme_points(dn1)
 #print("up_right {}\n".format(up_right))
 
 # 2. Find separating plane
 C_up = find_separation_plane(up1.values)
 C_dn = find_separation_plane(dn1.values)
+# Z = C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
 #print("C_up {}\n".format(C_up))
 
 
-# 3. Assign point to side
+# 3. Assign point to side  (do it for both sides on both sides)
 up_right_points, up_left_points = assign_points(C_up, up1)
 dn_right_points, dn_left_points = assign_points(C_dn, dn1)
-#print("right_points_up_shape {}\n".format(right_points_up.shape))
+#print("right_points_up_shape {}\n".format(up_right_points.shape))
 #plot_projection_up_down(right_points_up, right_points_up)
+
+# Add border points to fit
+up_right_points = up_right_points.append(pd.DataFrame(up_side1_border.reshape(1, 3), columns = ["X","Y","Z"]))
+up_right_points = up_right_points.append(pd.DataFrame(up_side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
+#print("up_right_points_shape {}\n".format(up_right_points.shape))
 
 # 4. Interpolate points
 up_right_popt = interpolate_points(up_right_points)
@@ -88,15 +96,18 @@ up_left_popt = interpolate_points(up_left_points)
 dn_right_popt = interpolate_points(dn_right_points)
 dn_left_popt = interpolate_points(dn_left_points)
 
-'''
-def plot_interpolation(up1, popt):
+def plot_interpolation_side(up_right_border, up_left_border, popt):  
     fig = plt.figure()
     ax = fig.gca(projection='3d')
+    range_X_up_r = np.linspace(up_right_border[0], up_left_border[0], 100)
+    range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], 100)
+    
+    data = np.c_[range_X_up_r, range_Y_up_r]
+    z = model_func(data, *popt)
+    plt.plot(range_X_up_r, range_Y_up_r, z, 'g--')
+    plt.show()
 
-    plt.plot(np.c_[up1.values[:,0], up1.values[:,1]], model_func(np.c_[up1.values[:,0], up1.values[:,1]], *popt), 'g--')
-    plt.show
-plot_interpolation(up_right_points, up_right_popt)
-'''
+plot_interpolation_side(up_side1_border, up_side2_border, up_right_popt)
 
 # 5. Projection
 
