@@ -34,13 +34,13 @@ def plot_projection_up_down(df_u, df_d):
     ax.set_xlabel('X', fontsize=20)
     ax.set_ylabel('Y', fontsize=20)
     ax.set_zlabel('Z', fontsize=20)
-
+    '''
     downlim, uplim = findMinMaxDF(df_u)
-    '''
-    ax.set_xlim([0, 40]);
-    ax.set_ylim([-20, 20]);
-    ax.set_zlim([110, 150]);
-    '''
+    
+    ax.set_xlim([downlim, uplim]);
+    ax.set_ylim([downlim, uplim]);
+    ax.set_zlim([downlim, uplim]);
+    '''   
     plt.title('Projection on plane', fontsize=20)
     plt.show()
 
@@ -126,6 +126,7 @@ def plot_interpolation_side(up_right_border, up_left_border, popt, i):
     
     data = np.c_[range_X_up_r, range_Y_up_r]
     z = model_func(data, *popt)
+
     plt.plot(range_X_up_r, range_Y_up_r, z, 'k')
     plt.title(i)
     plt.show()

@@ -16,7 +16,7 @@ import numpy as np
 # read dataframe
 
 print("Begin pre-processing")
-propeller = pd.read_csv('aerostar_data.csv')
+propeller = pd.read_csv('propeller_data.csv')
 propeller = center_prop(propeller)
 #propeller = align_prop(propeller)
 
@@ -47,7 +47,7 @@ print("Finish pre-processing")
 
 print("Begin projections")
 nb_seg = 3
-resolution = 3
+resolution = 10
 
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
 segments = get_segments_points(upper_blade, planes, nb_seg)
@@ -73,6 +73,8 @@ C_dn = find_separation_plane(dn1.values)
 #print("C_up {}\n".format(C_up))
 
 
+
+
 # 3. Assign point to side  (do it for both sides on both sides)
 up_right_points, up_left_points = assign_points(C_up, up1)
 dn_right_points, dn_left_points = assign_points(C_dn, dn1)
@@ -89,28 +91,31 @@ plot_projection_up_down(up_right_points, up_left_points)
 plot_projection_up_down(dn_right_points, dn_left_points)
 
 
+
+
 # 4. Interpolate points
 up_right_popt = interpolate_points(up_right_points)
 up_left_popt  = interpolate_points(up_left_points)
 dn_right_popt = interpolate_points(dn_right_points)
 dn_left_popt  = interpolate_points(dn_left_points)
 
-
 plot_interpolation_side(up_side1_border, up_side2_border, up_right_popt, "1")
 plot_interpolation_side(up_side1_border, up_side2_border, up_left_popt, "2")
 plot_interpolation_side(dn_side1_border, dn_side2_border, dn_right_popt, "3")
 plot_interpolation_side(dn_side1_border, dn_side2_border, dn_left_popt, "4")
 
-# 5. Projection
-up_right_pts = points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt)
-dn_right_pts = points_from_curve(dn_right_border, dn_left_border, nb_points, dn_right_popt)
+nb_points = 100
 
-up_left_pts = points_from_curve(up_right_border, up_left_border, nb_points, up_left_popt) 
-dn_left_pts = points_from_curve(dn_right_border, dn_left_border, nb_points, dn_left_popt)
+# 5. Projection
+up_right_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up_right_popt)
+dn_right_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_right_popt)
+
+up_left_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up_left_popt) 
+dn_left_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_left_popt)
 
 # Projection de la ligne reliant 2 points sur le plan
 proj_right_df, proj_left_df = project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts, plan1)
-
+plot_projection_up_down(proj_right_df, proj_left_df)
 # 6. Interpolation surfacce
 popt_right = interpolate_points(proj_right_df)
 popt_left  = interpolate_points(proj_left_df)
