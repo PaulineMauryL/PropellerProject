@@ -1,14 +1,13 @@
-from plot_projections import plot_all_projections, plot_final_projections, plot_point_for_couple, plot_projection_up_down, plot_border
+from plot_projections import *
 from prop_info import extreme_points, vect_blade, d_blade, center_prop
 from get_segments import blade_alone, get_segments_points, get_planes
 from major_axis import get_major_axis
 #from projections import couple_all_planes, project_all_couples, projections_by_side, project_couple
-from new_projections import assign_points, get_all_points_for_projections, interpolations, find_separation_plane, interpolate_points
-from parameters import get_hub_points, get_hub_radius
-from plot_param import plot_hub
-from plot_prop import plot_pointcloud, plot_direction, plot_segments
+from new_projections import *
+#from parameters import get_hub_points, get_hub_radius
+#from plot_param import plot_hub
+#from plot_prop import plot_pointcloud, plot_direction, plot_segments
 from myMathFunction import least_squares
-from new_projections import model_func
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -17,25 +16,20 @@ import numpy as np
 # read dataframe
 
 print("Begin pre-processing")
-propeller = pd.read_csv('aerostar_data.csv')
+propeller = pd.read_csv('propeller_data.csv')
 propeller = center_prop(propeller)
 #propeller = align_prop(propeller)
 
 propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)
 propeller_coords = propeller_coords.reset_index(drop=True)
-
-
-
 #propeller_coords['Z'] = propeller_coords['Z'] - 200
 #propeller_coords = propeller_coords.sub(propeller_coords.mean(axis=1), axis=0)
 #print(propeller_coords.shape)
 
 max_point, min_point, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
-
 #TODO Put it in 0,0,0 coordinates
 
 #plot_pointcloud(propeller_coords)
-
 vect_length = vect_blade(max_point, min_point) 
 dmiddle, dhighest, dlowest = d_blade(vect_length, middle_point, highest_point, lowest_point)
 upper_blade, lower_blade = blade_alone(propeller_coords, vect_length, dmiddle)
@@ -53,7 +47,7 @@ print("Finish pre-processing")
 
 print("Begin projections")
 nb_seg = 3
-resolution = 3
+resolution = 10
 
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
 segments = get_segments_points(upper_blade, planes, nb_seg)
@@ -79,6 +73,8 @@ C_dn = find_separation_plane(dn1.values)
 #print("C_up {}\n".format(C_up))
 
 
+
+
 # 3. Assign point to side  (do it for both sides on both sides)
 up_right_points, up_left_points = assign_points(C_up, up1)
 dn_right_points, dn_left_points = assign_points(C_dn, dn1)
@@ -86,32 +82,42 @@ dn_right_points, dn_left_points = assign_points(C_dn, dn1)
 #plot_projection_up_down(right_points_up, right_points_up)
 
 # Add border points to fit
-up_right_points = up_right_points.append(pd.DataFrame(up_side1_border.reshape(1, 3), columns = ["X","Y","Z"]))
-up_right_points = up_right_points.append(pd.DataFrame(up_side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
+up_right_points = add_border_points(up_right_points, up_side1_border, up_side2_border)
+up_left_points  = add_border_points(up_left_points,  up_side1_border, up_side2_border)
+dn_right_points = add_border_points(dn_right_points, dn_side1_border, dn_side2_border)
+dn_left_points  = add_border_points(dn_left_points,  dn_side1_border, dn_side2_border)
 #print("up_right_points_shape {}\n".format(up_right_points.shape))
+plot_projection_up_down(up_right_points, up_left_points)
+plot_projection_up_down(dn_right_points, dn_left_points)
+
+
+
 
 # 4. Interpolate points
 up_right_popt = interpolate_points(up_right_points)
-up_left_popt = interpolate_points(up_left_points)
+up_left_popt  = interpolate_points(up_left_points)
 dn_right_popt = interpolate_points(dn_right_points)
-dn_left_popt = interpolate_points(dn_left_points)
+dn_left_popt  = interpolate_points(dn_left_points)
 
-def plot_interpolation_side(up_right_border, up_left_border, popt):  
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    range_X_up_r = np.linspace(up_right_border[0], up_left_border[0], 100)
-    range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], 100)
-    
-    data = np.c_[range_X_up_r, range_Y_up_r]
-    z = model_func(data, *popt)
-    plt.plot(range_X_up_r, range_Y_up_r, z, 'g--')
-    plt.show()
+plot_interpolation_side(up_side1_border, up_side2_border, up_right_popt, "1")
+plot_interpolation_side(up_side1_border, up_side2_border, up_left_popt, "2")
+plot_interpolation_side(dn_side1_border, dn_side2_border, dn_right_popt, "3")
+plot_interpolation_side(dn_side1_border, dn_side2_border, dn_left_popt, "4")
 
-plot_interpolation_side(up_side1_border, up_side2_border, up_right_popt)
+nb_points = 100
 
 # 5. Projection
+pts_up_right, pts_dn_right = points_from_curve(up_side1_border, up_side2_border, nb_points, up_right_popt, dn_right_popt)
 
+pts_up_left, pts_dn_left   = points_from_curve(up_side1_border, up_side2_border, nb_points, up_left_popt,  dn_left_popt) 
 
+# Projection de la ligne reliant 2 points sur le plan
+proj_right_df, proj_left_df = project_points_on_plane(pts_up_right, pts_dn_right, pts_up_left, pts_dn_left, plan1)
+plot_projection_up_down(proj_right_df, proj_left_df)
+
+# 6. Interpolation surfacce
+popt_right = interpolate_points(proj_right_df)
+popt_left  = interpolate_points(proj_left_df)
 print("Finish projection")
 
 
