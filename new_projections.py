@@ -147,29 +147,29 @@ def model_func(data, a, b, c, d, e, f, g, h):
     return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])
     #return a*(data[:,0]**3) + b*(data[:,1]**3) + c * np.ones([data[:,0].shape[0],])
 
-def points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt, dn_right_popt):
+def points_from_curve(up_right_border, up_left_border, nb_points, up_right_popt):
 
     range_X_up_r = np.linspace(up_right_border[0], up_left_border[0], nb_points)
     range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], nb_points)
     
     interpolated_pts_up = np.zeros((len(range_X_up_r), 3))
-    interpolated_pts_dn = np.zeros((len(range_X_up_r), 3))
+    #interpolated_pts_dn = np.zeros((len(range_X_up_r), 3))
 
     #for x in range_X_up_r:
     #    for y in range_Y_up_r:
     data = np.c_[range_X_up_r, range_Y_up_r]
     z_up = model_func(data, *up_right_popt)
-    z_dn = model_func(data, *dn_right_popt)
+    #z_dn = model_func(data, *dn_right_popt)
 
     interpolated_pts_up[:, 0] = range_X_up_r
     interpolated_pts_up[:, 1] = range_Y_up_r
     interpolated_pts_up[:, 2] = z_up
 
-    interpolated_pts_dn[:, 0] = range_X_up_r
-    interpolated_pts_dn[:, 1] = range_Y_up_r
-    interpolated_pts_dn[:, 2] = z_dn   
+    #interpolated_pts_dn[:, 0] = range_X_up_r
+    #interpolated_pts_dn[:, 1] = range_Y_up_r
+    #interpolated_pts_dn[:, 2] = z_dn   
 
-    return interpolated_pts_up, interpolated_pts_dn #np.asarray([range_X_up_r, range_Y_up_r, z])  #TO DO: retourner tableaux nb_points * 3. Zip ?
+    return interpolated_pts_up #, interpolated_pts_dn #np.asarray([range_X_up_r, range_Y_up_r, z])  #TO DO: retourner tableaux nb_points * 3. Zip ?
 
 
 #projections = proj_right
@@ -197,6 +197,22 @@ def add_border_points(up_right_points, up_side1_border, up_side2_border):
     up_right_points = up_right_points.append(pd.DataFrame(up_side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
 
     return up_right_points
+
+
+def all_border(up_side1_border, up_side2_border, dn_side1_border, dn_side2_border):
+    borders_tb = np.zeros([4,3])
+    
+    borders_tb[0][:] = up_side1_border
+    borders_tb[1][:] = up_side2_border
+    borders_tb[2][:] = dn_side1_border
+    borders_tb[3][:] = dn_side2_border
+    
+    xmin = min(borders_tb[:,0])
+    xmax = max(borders_tb[:,0])
+    ymin = min(borders_tb[:,1])
+    ymax = max(borders_tb[:,1])
+    
+    return xmin, xmax, ymin, ymax
 
 
 def projection_one_plane(up1, dn1, plan1, nb_points):
@@ -250,3 +266,4 @@ def projection_one_plane(up1, dn1, plan1, nb_points):
     
 
     return popt_right, popt_left
+
