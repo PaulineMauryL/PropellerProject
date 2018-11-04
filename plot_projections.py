@@ -130,3 +130,11 @@ def plot_interpolation_side(up_right_border, up_left_border, popt, i):
     plt.plot(range_X_up_r, range_Y_up_r, z, 'k')
     plt.title(i)
     plt.show()
+
+def plot_xyz_table(interpolated_pts_up):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    plt.plot(interpolated_pts_up[:, 0], interpolated_pts_up[:, 1], interpolated_pts_up[:, 2], 'k')
+    plt.title("Points from interpolation")
+    plt.show()
