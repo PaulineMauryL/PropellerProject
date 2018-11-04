@@ -14,12 +14,20 @@ def center_prop(propeller_coords):
 
 def align_prop(propeller_coords):
 	_, _, _, highest_point, _ = extreme_points(propeller_coords)
+	rotation_point = highest_point.copy()
+	rotation_point[2] = 0
 
-	angle_phi = get_phi(highest_point)
-	angle_theta = get_theta(highest_point)
+	theta =  np.arccos( (rotation_point @ [0,1,0]) / (np.linalg.norm(rotation_point) * np.linalg.norm([0,1,0]))) #* 180/np.pi
+	ct, st = np.cos(theta), np.sin(theta)
+	rotz = np.array(((ct,-st, 0), (st, ct, 0), (0,0,1)))
 
-	#transformation de chaque point en fonction de sa distance r avec phi et theta
+	rot_proj = rotz @ highest_point
+	phi =  - np.arccos( (rot_proj @ [0,0,1]) / (np.linalg.norm(rot_proj) * np.linalg.norm([0,0,1]))) #* 180/np.pi
+	cp, sp = np.cos(phi), np.sin(phi)
+	rotx = np.array(((1, 0, 0), (0, cp, -sp), (0,sp,cp)))
 
+	propeller_coords = propeller_coords.apply(lambda x: rotx @ rotz @ x.values, axis = 1)
+	
 	return propeller_coords
 
 def extreme_points(propeller_coords):
