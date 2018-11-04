@@ -1,5 +1,6 @@
 from plot_projections import *
-from prop_info import extreme_points, vect_blade, d_blade, center_prop
+from plot_prop import *
+from prop_info import *
 from get_segments import blade_alone, get_segments_points, get_planes
 from major_axis import get_major_axis
 #from projections import couple_all_planes, project_all_couples, projections_by_side, project_couple
@@ -18,8 +19,9 @@ import numpy as np
 print("Begin pre-processing")
 propeller = pd.read_csv('propeller_data.csv')
 propeller = center_prop(propeller)
-#propeller = align_prop(propeller)
-
+propeller = align_prop(propeller)
+plot_pointcloud(propeller)
+print("Aligned")
 propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)
 propeller_coords = propeller_coords.reset_index(drop=True)
 #propeller_coords['Z'] = propeller_coords['Z'] - 200
