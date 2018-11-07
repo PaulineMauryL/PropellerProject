@@ -135,6 +135,6 @@ def d_blade(vect_length, middle_point, highest_point, lowest_point):
 	#dmax     = - max_point @ vect_blade
 	#dmin     = - min_point @ vect_blade
 	dhighest = - highest_point @ vect_length
-	dlowest  = - highest_point @ vect_length
+	dlowest  = - lowest_point @ vect_length
 
 	return dmiddle, dhighest, dlowest
