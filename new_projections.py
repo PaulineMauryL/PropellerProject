@@ -132,13 +132,20 @@ def assign_points(C_up, up):
 
 def interpolate_points(up1):
     data = np.c_[up1.values[:,0], up1.values[:,1]]
+    x = up1.values[:,0]
+    y = up1.values[:,1]
     z = up1.values[:,2]
-
-    sigma = np.ones(len(data))
-    sigma[[-1, -2]] = 0.1  #assign more weight to border points
-    popt, pcov = curve_fit(model_func, data, z, sigma=sigma)    
+    #sigma = np.ones(len(data))
+    #sigma[[-1, -2]] = 0.1  #assign more weight to border points
+    #print("data0 is {} of type {}".format(data[:,1], type(data[:,1])))
+    popt, _ = curve_fit(function_poly2d, data, z)#, sigma=sigma) 
+    #print("done")  
     return popt
 
+def function_poly2d(data, A, B, C, D, E, F):
+    x = data[:,0]
+    y = data[:,1]
+    return A * x ** 2  + B * y ** 2 + C * x * y + D * x + E * y + F
 
 def ls_plane(C, X):
     return C[2]*X**2 + C[1]*X + C[0]
@@ -213,6 +220,13 @@ def all_border(up_side1_border, up_side2_border, dn_side1_border, dn_side2_borde
     ymax = max(borders_tb[:,1])
     
     return xmin, xmax, ymin, ymax
+
+
+
+
+
+
+
 
 
 def projection_one_plane(up1, dn1, plan1, nb_points):

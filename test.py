@@ -20,8 +20,9 @@ print("Begin pre-processing")
 propeller = pd.read_csv('propeller_data.csv')
 propeller = center_prop(propeller)
 propeller = align_prop(propeller)
-plot_pointcloud(propeller)
+#plot_pointcloud(propeller)
 print("Aligned")
+
 propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)
 propeller_coords = propeller_coords.reset_index(drop=True)
 #propeller_coords['Z'] = propeller_coords['Z'] - 200
@@ -29,7 +30,6 @@ propeller_coords = propeller_coords.reset_index(drop=True)
 #print(propeller_coords.shape)
 
 max_point, min_point, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
-#TODO Put it in 0,0,0 coordinates
 
 #plot_pointcloud(propeller_coords)
 vect_length = vect_blade(max_point, min_point) 
@@ -71,6 +71,7 @@ dn_side1_border, dn_side2_border, _, _, _ = extreme_points(dn1)
 # 2. Find separating plane
 C_up = find_separation_plane(up1.values)
 C_dn = find_separation_plane(dn1.values)
+#print("least squares param Cup is {} \n of shape {} \n".format(C_up, C_up.shape))
 # Z = C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
 #print("C_up {}\n".format(C_up))
 
@@ -80,6 +81,7 @@ C_dn = find_separation_plane(dn1.values)
 # 3. Assign point to side  (do it for both sides on both sides)
 up_right_points, up_left_points = assign_points(C_up, up1)
 dn_right_points, dn_left_points = assign_points(C_dn, dn1)
+#print(type(up_right_points))
 #print("right_points_up_shape {}\n".format(up_right_points.shape))
 #plot_projection_up_down(right_points_up, right_points_up)
 
@@ -89,10 +91,10 @@ up_left_points  = add_border_points(up_left_points,  up_side1_border, up_side2_b
 dn_right_points = add_border_points(dn_right_points, dn_side1_border, dn_side2_border)
 dn_left_points  = add_border_points(dn_left_points,  dn_side1_border, dn_side2_border)
 #print("up_right_points_shape {}\n".format(up_right_points.shape))
-plot_projection_up_down(up_right_points, up_left_points)
-plot_projection_up_down(dn_right_points, dn_left_points)
+#plot_projection_up_down(up_right_points, up_left_points)
+#plot_projection_up_down(dn_right_points, dn_left_points)
 
-
+#print(type(up_right_points))  #dataframe
 
 
 # 4. Interpolate points
@@ -101,12 +103,53 @@ up_left_popt  = interpolate_points(up_left_points)
 dn_right_popt = interpolate_points(dn_right_points)
 dn_left_popt  = interpolate_points(dn_left_points)
 
-plot_interpolation_side(up_side1_border, up_side2_border, up_right_popt, "1")
-plot_interpolation_side(up_side1_border, up_side2_border, up_left_popt, "2")
-plot_interpolation_side(dn_side1_border, dn_side2_border, dn_right_popt, "3")
-plot_interpolation_side(dn_side1_border, dn_side2_border, dn_left_popt, "4")
+#plot_interpolation_side(up_side1_border, up_side2_border, up_right_popt, "1")
+#plot_interpolation_side(up_side1_border, up_side2_border, up_left_popt, "2")
+#plot_interpolation_side(dn_side1_border, dn_side2_border, dn_right_popt, "3")
+#plot_interpolation_side(dn_side1_border, dn_side2_border, dn_left_popt, "4")
+
+plot_interpolation_side_with_points(up_right_popt, up_right_points, up_side1_border, "up_right")
+#plot_interpolation_side_with_points(dn_right_popt, dn_right_points, "down_right")
+
+#plot_interpolation_side_with_points(dn_left_popt, dn_left_points, "dn_left")
+#plot_interpolation_side_with_points(up_left_popt, up_left_points, "up_left")
+
 
 nb_points = 100
+'''
+
+x = up_right_points.values[:,0]
+y = up_right_points.values[:,1]
+z = up_right_points.values[:,2]
+data = np.c_[x,y,z]
+mn = np.min(data, axis=0)
+mx = np.max(data, axis=0)
+X,Y = np.meshgrid(np.linspace(mn[0], mx[0], 20), np.linspace(mn[1], mx[1], 20))
+XX = X.flatten()
+YY = Y.flatten()
+
+Z = function_poly2d(np.c_[x,y], *up_right_popt)
+
+fig1 =  plt.figure(figsize=(10, 10))
+ax = fig1.gca(projection='3d')
+ax.plot_surface(X, Y, Z, rstride=1, cstride=1, alpha=0.2)
+ax.scatter(data[:,0], data[:,1], data[:,2], c='r', s=50)
+plt.xlabel('X')
+plt.ylabel('Y')
+ax.set_zlabel('Z')
+ax.axis('equal')
+ax.axis('tight')
+'''
+'''
+xx, yy = np.meshgrid(x,y)
+zz = function_poly2d((xx,yy), *up_right_popt)
+xx = xx.flatten()
+yy = yy.flatten()
+zz = zz.flatten()
+plotfit_poly2d(xx, yy, zz, up_right_popt, title='Least squares method')
+'''
+
+
 
 # 5. Projection
 #xmin, xmax, ymin, ymax = all_border(up_side1_border, up_side2_border, dn_side1_border, dn_side2_border)
@@ -118,12 +161,13 @@ up_right_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up
 dn_right_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_right_popt)
 up_left_pts  = points_from_curve(up_side1_border, up_side2_border, nb_points, up_left_popt)
 dn_left_pts  = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_left_popt)
-
-plot_xyz_table(up_right_pts)
+#print(type(up_right_pts))   #array
+#plot_xyz_table(up_right_pts)
 
 # Projection de la ligne reliant 2 points sur le plan
 proj_right_df, proj_left_df = project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts, plan1)
-plot_projection_up_down(proj_right_df, proj_left_df)
+#plot_projection_up_down(proj_right_df, proj_left_df)
+plot_interpolation_and_points(proj_right_df, proj_left_df, up_right_points, up_left_points, dn_right_points, dn_left_points)
 
 # 6. Interpolation surfacce
 popt_right = interpolate_points(proj_right_df)
