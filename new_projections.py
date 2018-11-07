@@ -102,13 +102,13 @@ def find_separation_plane(data):
         #Z = np.dot(np.c_[XX, YY, np.ones(XX.shape)], C).reshape(X.shape)
     elif order == 2:
         # best-fit quadratic curve
-        A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
-        C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
+        A = np.c_[np.ones(data.shape[0]), data[:,:1], data[:,:1]**2]
+        C,_,_,_ = scipy.linalg.lstsq(A, data[:,1])
         #print("C\n")
         #print(C)
         # evaluate it on a grid
         #Z = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
-        Z = C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
+        #Z = C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
         #print("Z\n")
         #print(Z)
     #plot_least_squares(X, Y, Z, data)
@@ -119,8 +119,8 @@ def assign_points(C_up, up):
     left = []
 
     for index, point in up.iterrows():
-        z = ls_plane(C_up, point[0], point[1])
-        if(z <= point[2]):
+        y = ls_plane(C_up, point[0])
+        if(y <= point[1]):
             right.append(index)
         else:
             left.append(index)
@@ -140,8 +140,8 @@ def interpolate_points(up1):
     return popt
 
 
-def ls_plane(C, X, Y):
-    return C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
+def ls_plane(C, X):
+    return C[2]*X**2 + C[1]*X + C[0]
 
 def model_func(data, a, b, c, d, e, f, g, h):    
     return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])
