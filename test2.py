@@ -38,8 +38,41 @@ size = 10  #propeller
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
 all_plane_points = get_points(propeller_coords, planes, size)
 
+
+
+
+one_plane_point = all_plane_points[0]
+
+#right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
+side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
+    
+param_sides = find_separation_plane(one_plane_point.values)
+one_plane_point.to_csv('points0.csv', index = False)
+
+right_points, left_points = assign_points(param_sides, one_plane_point)
+#right_points.to_csv('right_points_0.csv', index = False)
+#left_points.to_csv('left_points_0.csv', index = False)
+
+
+
 one_plane_point = all_plane_points[1]
 
-right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
+#right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
+side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
+    
+param_sides = find_separation_plane(one_plane_point.values)
+one_plane_point.to_csv('points1.csv', index = False)
 
-plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, "Aerofoil_weight0.1_cubic_interpolation")
+right_points, left_points = assign_points(param_sides, one_plane_point)
+#right_points.to_csv('right_points_1.csv', index = False)
+#left_points.to_csv('left_points_1.csv', index = False)
+
+
+
+right_points = add_border_points(right_points, side1_border, side2_border)
+left_points  = add_border_points(left_points,  side1_border, side2_border)
+    
+right_popt = interpolate_points(right_points)
+left_popt  = interpolate_points(left_points)
+
+#plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, "Aerofoil_weight0.1_cubic_interpolation")
