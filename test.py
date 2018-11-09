@@ -86,10 +86,10 @@ dn_right_points, dn_left_points = assign_points(C_dn, dn1)
 #plot_projection_up_down(right_points_up, right_points_up)
 
 # Add border points to fit
-up_right_points = add_border_points(up_right_points, up_side1_border, up_side2_border)
-up_left_points  = add_border_points(up_left_points,  up_side1_border, up_side2_border)
-dn_right_points = add_border_points(dn_right_points, dn_side1_border, dn_side2_border)
-dn_left_points  = add_border_points(dn_left_points,  dn_side1_border, dn_side2_border)
+up_right_points = (  add_border_points(up_right_points, up_side1_border, up_side2_border)  ).sort_values('X').reset_index(drop=True)
+up_left_points  = (  add_border_points(up_left_points,  up_side1_border, up_side2_border)  ).sort_values('X').reset_index(drop=True)
+dn_right_points = (  add_border_points(dn_right_points, dn_side1_border, dn_side2_border)  ).sort_values('X').reset_index(drop=True)
+dn_left_points  = (  add_border_points(dn_left_points,  dn_side1_border, dn_side2_border)  ).sort_values('X').reset_index(drop=True)
 #print("up_right_points_shape {}\n".format(up_right_points.shape))
 #plot_projection_up_down(up_right_points, up_left_points)
 #plot_projection_up_down(dn_right_points, dn_left_points)
@@ -108,48 +108,14 @@ dn_left_popt  = interpolate_points(dn_left_points)
 #plot_interpolation_side(dn_side1_border, dn_side2_border, dn_right_popt, "3")
 #plot_interpolation_side(dn_side1_border, dn_side2_border, dn_left_popt, "4")
 
-plot_interpolation_side_with_points(up_right_popt, up_right_points, up_side1_border, "up_right")
-#plot_interpolation_side_with_points(dn_right_popt, dn_right_points, "down_right")
+plot_interpolation_side_with_points(up_right_popt, up_right_points, "up_right")
+plot_interpolation_side_with_points(dn_right_popt, dn_right_points, "down_right")
 
-#plot_interpolation_side_with_points(dn_left_popt, dn_left_points, "dn_left")
-#plot_interpolation_side_with_points(up_left_popt, up_left_points, "up_left")
+plot_interpolation_side_with_points(dn_left_popt, dn_left_points, "dn_left")
+plot_interpolation_side_with_points(up_left_popt, up_left_points, "up_left")
 
 
 nb_points = 100
-'''
-
-x = up_right_points.values[:,0]
-y = up_right_points.values[:,1]
-z = up_right_points.values[:,2]
-data = np.c_[x,y,z]
-mn = np.min(data, axis=0)
-mx = np.max(data, axis=0)
-X,Y = np.meshgrid(np.linspace(mn[0], mx[0], 20), np.linspace(mn[1], mx[1], 20))
-XX = X.flatten()
-YY = Y.flatten()
-
-Z = function_poly2d(np.c_[x,y], *up_right_popt)
-
-fig1 =  plt.figure(figsize=(10, 10))
-ax = fig1.gca(projection='3d')
-ax.plot_surface(X, Y, Z, rstride=1, cstride=1, alpha=0.2)
-ax.scatter(data[:,0], data[:,1], data[:,2], c='r', s=50)
-plt.xlabel('X')
-plt.ylabel('Y')
-ax.set_zlabel('Z')
-ax.axis('equal')
-ax.axis('tight')
-'''
-'''
-xx, yy = np.meshgrid(x,y)
-zz = function_poly2d((xx,yy), *up_right_popt)
-xx = xx.flatten()
-yy = yy.flatten()
-zz = zz.flatten()
-plotfit_poly2d(xx, yy, zz, up_right_popt, title='Least squares method')
-'''
-
-
 
 # 5. Projection
 #xmin, xmax, ymin, ymax = all_border(up_side1_border, up_side2_border, dn_side1_border, dn_side2_border)
@@ -157,16 +123,17 @@ plotfit_poly2d(xx, yy, zz, up_right_popt, title='Least squares method')
 #pts_up_right, pts_dn_right = points_from_curve(xmin, xmax, ymin, ymax, nb_points, up_right_popt, dn_right_popt)
 #pts_up_left, pts_dn_left   = points_from_curve(xmin, xmax, ymin, ymax, nb_points, up_left_popt,  dn_left_popt) 
 
-up_right_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up_right_popt)
-dn_right_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_right_popt)
-up_left_pts  = points_from_curve(up_side1_border, up_side2_border, nb_points, up_left_popt)
-dn_left_pts  = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_left_popt)
+up_right_pts = points_from_curve(up_right_points, up_right_popt)
+dn_right_pts = points_from_curve(dn_right_points, dn_right_popt)
+up_left_pts  = points_from_curve(up_left_points, up_left_popt)
+dn_left_pts  = points_from_curve(dn_left_points, dn_left_popt)
 #print(type(up_right_pts))   #array
 #plot_xyz_table(up_right_pts)
 
 # Projection de la ligne reliant 2 points sur le plan
 proj_right_df, proj_left_df = project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts, plan1)
 #plot_projection_up_down(proj_right_df, proj_left_df)
+
 plot_interpolation_and_points(proj_right_df, proj_left_df, up_right_points, up_left_points, dn_right_points, dn_left_points)
 
 # 6. Interpolation surfacce

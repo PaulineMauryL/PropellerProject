@@ -125,41 +125,30 @@ def plot_interpolation_side(up_right_border, up_left_border, popt, i):
     range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], 100)
     
     data = np.c_[range_X_up_r, range_Y_up_r]
-    z = model_func(data, *popt)
+    z = function_poly2d(data, *popt)
 
     plt.plot(range_X_up_r, range_Y_up_r, z, 'k')
     plt.title(i)
     plt.show()
 
-def plot_interpolation_side_with_points(popt, up_right_points, start, title):  
+def plot_interpolation_side_with_points(popt, up_right_points, title):  
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    '''
-    range_X_up_r = np.linspace(up_side1_border[0], up_side2_border[0], 100)
-    range_Y_up_r = np.linspace(up_side1_border[1], up_side2_border[1], 100)
-    #data = np.c_[range_X_up_r, range_Y_up_r]
-    X,Y = np.meshgrid(range_X_up_r, range_Y_up_r)
-    XX = X.flatten()
-    YY = Y.flatten()
+    #print(type(up_right_points))
 
-    data = np.c_[XX, YY]
-    '''
-
-    #data = np.meshgrid(up_right_points.values[:,0], up_right_points.values[:,1])
-    #z = up1.values[:,2]
     data = np.c_[up_right_points.values[:,0], up_right_points.values[:,1]]
     z = function_poly2d(data, *popt)
 
-    all_points = (np.c_[up_right_points.values[:,0], up_right_points.values[:,1], z]).tolist()
-    path = optimized_path(all_points, start)
-
-    plt.plot(path[:,0], path[:,1], path[:2], 'k')
+    plt.plot(up_right_points["X"], up_right_points["Y"], z, 'k')
+    #path = optimized_path(all_points, start)
+    #plt.plot(path[:,0], path[:,1], path[:2], 'k')
 
     ax.scatter(up_right_points["X"], up_right_points["Y"], up_right_points["Z"], 'r.', s=10)
 
     plt.title(title)
     plt.show()
 
+'''
 def optimized_path(coords, start):
     #https://stackoverflow.com/questions/45829155/sort-points-in-order-to-have-a-continuous-curve-using-python
     """
@@ -175,7 +164,7 @@ def optimized_path(coords, start):
         path.append(nearest)
         pass_by.remove(nearest)
     return path
-
+'''
 
 
 def plot_xyz_table(interpolated_pts_up):
