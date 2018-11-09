@@ -47,6 +47,7 @@ def get_all_points_for_projections(planes, segments, nb_seg, resolution):
     down = []
     labels = ['X', 'Y', 'Z']
 
+
     for proj in range(1, nb_seg):
         up_i, down_i = get_points_to_project_on_plane(planes[proj], segments['points'][proj-1], segments['points'][proj], resolution)
         up.append(pd.DataFrame(up_i, columns = labels))
@@ -55,8 +56,6 @@ def get_all_points_for_projections(planes, segments, nb_seg, resolution):
     return up, down
 
 
-
-#plan = planes[i], segment_down = segments['points'][proj-1], segment_up = segments['points'][proj], nb_point)
 def get_points_to_project_on_plane(plane, segment_down, segment_up, resolution):
     '''Get points in a range 'resolution' around the plan'''
         #print(segment_down.shape)
@@ -91,26 +90,8 @@ def find_separation_plane(data):
     XX = X.flatten()
     YY = Y.flatten()
 
-    order = 2    # 1: linear, 2: quadratic
-    if order == 1:
-        # best-fit linear plane
-        A = np.c_[data[:,0], data[:,1], np.ones(data.shape[0])]
-        C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])    # coefficients
-        # evaluate it on grid
-        Z = C[0]*X + C[1]*Y + C[2]    
-        # or expressed using matrix/vector product
-        #Z = np.dot(np.c_[XX, YY, np.ones(XX.shape)], C).reshape(X.shape)
-    elif order == 2:
-        # best-fit quadratic curve
-        A = np.c_[np.ones(data.shape[0]), data[:,:1], data[:,:1]**2]
-        C,_,_,_ = scipy.linalg.lstsq(A, data[:,1])
-        #print("C\n")
-        #print(C)
-        # evaluate it on a grid
-        #Z = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
-        #Z = C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
-        #print("Z\n")
-        #print(Z)
+    A = np.c_[np.ones(data.shape[0]), data[:,:1], data[:,:1]**2, data[:,:1]**3]
+    C,_,_,_ = scipy.linalg.lstsq(A, data[:,1])
     #plot_least_squares(X, Y, Z, data)
     return C
 
@@ -131,14 +112,14 @@ def assign_points(C_up, up):
     return right_points, left_points
 
 def interpolate_points(up1):
-    data = np.c_[up1.values[:,0], up1.values[:,1]]
+    #data = np.c_[up1.values[:,0], up1.values[:,1]]
     x = up1.values[:,0]
     y = up1.values[:,1]
-    z = up1.values[:,2]
-    #sigma = np.ones(len(data))
-    #sigma[[-1, -2]] = 0.1  #assign more weight to border points
+    #z = up1.values[:,2]
+    sigma = np.ones(len(x))
+    sigma[[-1, -2]] = 1  #assign more weight to border points
     #print("data0 is {} of type {}".format(data[:,1], type(data[:,1])))
-    popt, _ = curve_fit(function_poly2d, data, z)#, sigma=sigma) 
+    popt, _ = curve_fit(model_func, x, y, sigma=sigma) 
     #print("done")  
     return popt
 
@@ -148,16 +129,17 @@ def function_poly2d(data, A, B, C, D, E, F):
     return A * x ** 2  + B * y ** 2 + C * x * y + D * x + E * y + F
 
 def ls_plane(C, X):
-    return C[2]*X**2 + C[1]*X + C[0]
+    return C[3]*X**3 + C[2]*X**2 + C[1]*X + C[0]
 
-def model_func(data, a, b, c, d, e, f, g, h):    
-    return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])
+def model_func(data, a, b, c, d):    
+    #return a*data[:,0]**3 + b*data[:,1]**3 + c*data[:,0]**2 + d*data[:,1]**2 + e*data[:,0]*data[:,1] + f*data[:,0] + g*data[:,1] + h * np.ones([data[:,0].shape[0],])
     #return a*(data[:,0]**3) + b*(data[:,1]**3) + c * np.ones([data[:,0].shape[0],])
+    return a*data[:]**3 + b*data[:]**2 + c*data[:] + d
 
 def points_from_curve(up_right_points, popt):
 
     data = np.c_[up_right_points.values[:,0], up_right_points.values[:,1]]
-    z = function_poly2d(data, *popt)
+    z = model_func(data, *popt)
     up_right_points["Z"] = z
     '''
     range_X_up_r = np.linspace(up_right_border[0], up_left_border[0], nb_points)
@@ -208,7 +190,7 @@ def add_border_points(up_right_points, up_side1_border, up_side2_border):
     up_right_points = up_right_points.append(pd.DataFrame(up_side1_border.reshape(1, 3), columns = ["X","Y","Z"]))
     up_right_points = up_right_points.append(pd.DataFrame(up_side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
 
-    return up_right_points
+    return up_right_points.sort_values('X').reset_index(drop=True)
 
 
 def all_border(up_side1_border, up_side2_border, dn_side1_border, dn_side2_border):
@@ -227,62 +209,47 @@ def all_border(up_side1_border, up_side2_border, dn_side1_border, dn_side2_borde
     return xmin, xmax, ymin, ymax
 
 
+def get_points(propeller_coords, planes, size):
+    '''Get the points around EACH plane within size distance'''
+    points = []
+
+    for i, plane in enumerate(planes):
+        if(i==0 or i == (len(planes)-1)):   #do not take into account first plane (hub) and last plane (extremity)
+            pass
+        else:
+            points.append( points_of_plane(propeller_coords, plane, size) )
+
+    return points
 
 
-
-
-
-
-
-def projection_one_plane(up1, dn1, plan1, nb_points):
-    # 1. Find border points
-    up_side1_border, up_side2_border, _, _, _ = extreme_points(up1)
-    dn_side1_border, dn_side2_border, _, _, _ = extreme_points(dn1)
-    #print("up_right {}\n".format(up_right))
+def points_of_plane(propeller_coords, plane, size):
+    '''Get the points around ONE plane within size distance'''
+    upper_plane = plane[:] + [0,0,0,size/2]
+    lower_plane = plane[:] - [0,0,0,size/2]
     
-    # 2. Find separating plane
-    C_up = find_separation_plane(up1.values)
-    C_dn = find_separation_plane(dn1.values)
-    # Z = C[4]*X**2. + C[5]*Y**2. + C[3]*X*Y + C[1]*X + C[2]*Y + C[0]
-    #print("C_up {}\n".format(C_up))
-    
-    # 3. Assign point to side  (do it for both sides on both sides)
-    up_right_points, up_left_points = assign_points(C_up, up1)
-    dn_right_points, dn_left_points = assign_points(C_dn, dn1)
-    #print("right_points_up_shape {}\n".format(up_right_points.shape))
-    
-    # Add border points to fit
-    up_right_points = add_border_points(up_right_points, up_side1_border, up_side2_border)
-    up_left_points  = add_border_points(up_left_points,  up_side1_border, up_side2_border)
-    dn_right_points = add_border_points(dn_right_points, dn_side1_border, dn_side2_border)
-    dn_left_points  = add_border_points(dn_left_points,  dn_side1_border, dn_side2_border)
-    #print("up_right_points_shape {}\n".format(up_right_points.shape))
+    index_segment = []
+    for index, point in propeller_coords.iterrows():
+        point_mult = np.append(point, 1)
 
-
-    # 4. Interpolate points
-    up_right_popt = interpolate_points(up_right_points)
-    up_left_popt  = interpolate_points(up_left_points)
-    dn_right_popt = interpolate_points(dn_right_points)
-    dn_left_popt  = interpolate_points(dn_left_points)
+        if(point_mult @ lower_plane < 0 and point_mult @ upper_plane >= 0):
+            index_segment.append(index)
+            #print("here")
+    plane_points = propeller_coords.loc[index_segment].copy()
     
-    #plot_interpolation_side(up_side1_border, up_side2_border, up_right_popt, "1")
-    #plot_interpolation_side(up_side1_border, up_side2_border, up_left_popt, "2")
-    #plot_interpolation_side(dn_side1_border, dn_side2_border, dn_right_popt, "3")
-    #plot_interpolation_side(dn_side1_border, dn_side2_border, dn_left_popt, "4")
+    return plane_points.reset_index(drop=True)
 
-    # 5. Final projection # Take points on each side
-    up_right_pts = points_from_curve(up_side1_border, up_side2_border, nb_points, up_right_popt)
-    dn_right_pts = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_right_popt)
-    up_left_pts  = points_from_curve(up_side1_border, up_side2_border, nb_points, up_left_popt) 
-    dn_left_pts  = points_from_curve(dn_side1_border, dn_side2_border, nb_points, dn_left_popt)
+def projection_results(one_plane_point):
     
-    # Projection de la ligne reliant 2 points sur le plan
-    proj_right_df, proj_left_df = project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts, plan1)
+    side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
     
-    # 6. Interpolation surfacce
-    popt_right = interpolate_points(proj_right_df)
-    popt_left  = interpolate_points(proj_left_df)
+    param_sides = find_separation_plane(one_plane_point.values)
     
-
-    return popt_right, popt_left
-
+    right_points, left_points = assign_points(param_sides, one_plane_point)
+    
+    right_points = add_border_points(right_points, side1_border, side2_border)
+    left_points  = add_border_points(left_points,  side1_border, side2_border)
+    
+    right_popt = interpolate_points(right_points)
+    left_popt  = interpolate_points(left_points)
+    
+    return right_popt, right_points, left_popt, left_points

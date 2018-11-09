@@ -25,9 +25,6 @@ print("Aligned")
 
 propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)
 propeller_coords = propeller_coords.reset_index(drop=True)
-#propeller_coords['Z'] = propeller_coords['Z'] - 200
-#propeller_coords = propeller_coords.sub(propeller_coords.mean(axis=1), axis=0)
-#print(propeller_coords.shape)
 
 max_point, min_point, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
 
