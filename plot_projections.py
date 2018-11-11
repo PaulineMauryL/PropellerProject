@@ -164,7 +164,7 @@ def plot_interpolation_both_sides(right_popt, right_points, left_popt, left_poin
 
     plt.title(title)
     plt.show()
-    fig.savefig('Image/' +title + '.png')
+    fig.savefig('Image/' + title + '.png')
 '''
 def optimized_path(coords, start):
     #https://stackoverflow.com/questions/45829155/sort-points-in-order-to-have-a-continuous-curve-using-python

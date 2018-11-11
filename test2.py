@@ -50,6 +50,7 @@ print("End pre-processing")
 
 
 
+
 #####################################################################################################
 ############################              PROJECTIONS            ####################################
 #####################################################################################################
@@ -61,13 +62,19 @@ all_plane_points = get_points(upper_blade, planes, delta)                  #get 
 #plot_projection_up_down(all_plane_points[0], all_plane_points[1])
 #plot_projection_up_down(all_plane_points[2], all_plane_points[3])
 right_param, left_param, right_pts, left_pts = get_all_projections(planes, all_plane_points) #get param, points of projection
-
+print(type(right_pts))
+print(right_pts)
+plot_interpolation_both_sides(right_param[1], right_pts[1], left_param[1], left_pts[1], "propeller_no_weight")
 print("End projections")
+
+
 
 
 #####################################################################################################
 #############################            PARAMETERS            ######################################
 #####################################################################################################
+
+
 
 
 

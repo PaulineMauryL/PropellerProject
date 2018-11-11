@@ -39,8 +39,6 @@ def get_major_axis(propeller_coords, vect_blade):
 	vect_side = normalize_vec(vect_side)
 	#print(vect_side)
 
-	_, _, middle_point, _, _ = extreme_points(propeller_coords)
-	print(middle_point)
 	hub_inner_radius = (middle_point - a_point) + (middle_point - b_point) + (middle_point - c_point)
 	hub_inner_radius = [i/3 for i in hub_inner_radius]
 	hub_inner_radius = np.linalg.norm(hub_inner_radius)
