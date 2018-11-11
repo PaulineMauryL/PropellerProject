@@ -97,7 +97,7 @@ def interpolate_points(up1):
     y = up1.values[:,1]
 
     sigma = np.ones(len(x))
-    sigma[[-1, -2]] = 1  #assign more weight to border points
+    #sigma[[-1, -2]] = 1  #assign more weight to border points
 
     popt, _ = curve_fit(model_func, x, y, sigma=sigma) 
 
@@ -153,17 +153,19 @@ def project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts
     return proj_right_df, proj_left_df
 
 
-def add_border_points(up_right_points, up_side1_border, up_side2_border):
+def add_border_points(right_points, one_plane_point):
     '''Add the border points to the list of points to interpolate 
     Goal: be more sure that each projection will start and end at same position
     INPUT: Dataframe points to project
             np.array coordinates of border points
     OUTPUT: DataFrame of ordered point to interpolate. (ordered important for plot)
     '''
-    up_right_points = up_right_points.append(pd.DataFrame(up_side1_border.reshape(1, 3), columns = ["X","Y","Z"]))
-    up_right_points = up_right_points.append(pd.DataFrame(up_side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
+    side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
 
-    return up_right_points.sort_values('X').reset_index(drop=True)
+    right_points = right_points.append(pd.DataFrame(side1_border.reshape(1, 3), columns = ["X","Y","Z"]))
+    right_points = right_points.append(pd.DataFrame(side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
+
+    return right_points.sort_values('X').reset_index(drop=True)
 
 
 def all_border(up_side1_border, up_side2_border, dn_side1_border, dn_side2_border):
@@ -186,7 +188,7 @@ def all_border(up_side1_border, up_side2_border, dn_side1_border, dn_side2_borde
 
 
 
-def get_points(propeller_coords, planes, size):
+def get_points(propeller_coords, planes, delta):
     '''Get the points around EACH plane for projection
     INPUT: Dataframe points of blade, 
                 np.array plane equation, 
@@ -199,44 +201,25 @@ def get_points(propeller_coords, planes, size):
         if(i==0 or i == (len(planes)-1)):   #do not take into account first plane (hub) and last plane (extremity)
             pass
         else:
-            points.append( points_of_plane(propeller_coords, plane, size) )
+            points.append( points_of_plane(propeller_coords, plane, delta) )
 
     return points
 
 
 
 def points_of_plane(propeller_coords, plane, delta):
-    '''Get the points around ONE plane within size distance'''
-    '''
-    upper_plane = plane[:] + [0,0,0,size/2]
-    lower_plane = plane[:] - [0,0,0,size/2]
-    
-
-    index_segment = []
-    for index, point in propeller_coords.iterrows():
-        point_mult = np.append(point, 1)
-
-        if(point_mult @ lower_plane < 0 and point_mult @ upper_plane >= 0):
-            index_segment.append(index)
-            #print("here")
-
-    plane_points = propeller_coords.loc[index_segment].copy()
-    
-    return plane_points.reset_index(drop=True)
-    '''
-    ''' Get the points to consider for projection on plane
+    ''' Get the points to consider for projection on ONE plane
         INPUT: Dataframe points of blade, 
                 np.array plane equation, 
                 scalar delta
         OUTPUT: Datafreme points to consider
     '''
     index_segment = []
-    delta = 0.5
     old_plane = plane[:]
     new_plane = plane[:] + [0,0,0,delta]
     threshold = 5
     nb_delta = 1
-
+    nb_pts_at_a_time = 0
 
     while(nb_pts_at_a_time < threshold):
         nb_pts_at_a_time = 0
@@ -255,15 +238,15 @@ def points_of_plane(propeller_coords, plane, delta):
     upper_plane = plane[:] + [0,0,0, delta * nb_delta * 2]
     for index, point in propeller_coords.iterrows():
         point_mult = np.append(point, 1)
-        if(point_mult @ plane < 0 and point_mult @ upperplane >= 0):
-            index_segment.apend(index)
+        if(point_mult @ plane < 0 and point_mult @ upper_plane >= 0):
+            index_segment.append(index)
 
 
     lower_plane = plane[:] - [0,0,0, delta * nb_delta * 2]
     for index, point in propeller_coords.iterrows():
         point_mult = np.append(point, 1)
         if(point_mult @ lower_plane < 0 and point_mult @ plane >= 0):
-            index_segment.apend(index)
+            index_segment.append(index)
 
     plane_points = propeller_coords.loc[index_segment].copy()
     
@@ -281,15 +264,18 @@ def projection_results(one_plane_point):
         OUTPUT: optimal interpolation parameters and projected points
                 for right and left side
     '''
-    side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
-    
+
+    #one_plane_point.to_csv('points0.csv', index = False)
+
     param_sides = find_separation_plane(one_plane_point.values)
     
     right_points, left_points = assign_points(param_sides, one_plane_point)
     
-    right_points = add_border_points(right_points, side1_border, side2_border)
-    left_points  = add_border_points(left_points,  side1_border, side2_border)
-    
+    right_points = add_border_points(right_points, one_plane_point)
+    left_points  = add_border_points(left_points, one_plane_point)
+    #right_points.to_csv('right_points_1.csv', index = False)
+    #left_points.to_csv('left_points_1.csv', index = False)
+
     right_popt = interpolate_points(right_points)
     left_popt  = interpolate_points(left_points)
     

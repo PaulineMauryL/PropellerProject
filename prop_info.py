@@ -21,7 +21,7 @@ def align_prop(propeller_coords):
 		OUTPUT: dataframe of aligned points
 	'''
 	_, _, _, highest_point, _ = extreme_points(propeller_coords)
-	print(type(highest_point))
+	#print(type(highest_point))
 	rotation_point = highest_point.copy()
 	rotation_point[2] = 0
 
@@ -34,9 +34,9 @@ def align_prop(propeller_coords):
 	cp, sp = np.cos(phi), np.sin(phi)
 	rotx = np.array([[1, 0, 0], [0, cp, -sp], [0,sp,cp]])
 
-	print(type(propeller_coords))
+	#print(type(propeller_coords))
 	propeller_coords = propeller_coords.apply(rotate, rx = rotx, rz = rotz, axis = 1, result_type = 'broadcast')
-	print(type(propeller_coords))
+	#print(type(propeller_coords))
 	return propeller_coords
 
 
