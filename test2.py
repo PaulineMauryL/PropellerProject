@@ -11,48 +11,63 @@ from major_axis import get_major_axis
 from new_projections import *
 
 
-print("Begin pre-processing")
-#propeller = pd.read_csv('aerostar_data.csv')
-#delta = 0.08   #aerostar
+''' Load data: choose a propeller. 
+	Should have already changes it with stl_to_csv.py
+'''
+propeller = pd.read_csv('aerostar_data.csv')
+delta = 0.1   #aerostar
 
-propeller = pd.read_csv('propeller_data.csv')
-delta = 0.5   #propeller
+#propeller = pd.read_csv('propeller_data.csv')
+#delta = 0.5   #propeller
 
+
+''' Choose number of aerofoil wanted
+'''
 nb_seg = 4
-
 #plot_pointcloud(propeller)
 
-propeller = center_prop(propeller)
-propeller = align_prop(propeller)
-#print(propeller)
+
+
+
+#####################################################################################################
+##########################            PRE-PROCESSING            #####################################
+#####################################################################################################
+print("Begin pre-processing")
+propeller = center_prop(propeller)  # center prop: middle in (0,0,0) coordinates
+propeller = align_prop(propeller)   # longest axis aligned along z-axis
+propeller = center_prop(propeller)  # re-center prop: slight shift in previous function
 #plot_pointcloud(propeller)
 print("Aligned")
 
-propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)
+propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)  #remove multiple same points 
 propeller_coords = propeller_coords.reset_index(drop=True)
 
-max_point, min_point, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
-vect_length                = vect_blade(max_point, min_point) 
-dmiddle, dhighest, dlowest = d_blade(vect_length, middle_point, highest_point, lowest_point)
-upper_blade, lower_blade   = blade_alone(propeller_coords, vect_length, dmiddle)
-vect_out, vect_side, hub_inner_radius = get_major_axis(propeller_coords, middle_point, vect_length)
-print("Finish pre-processing")
+vect_length                = vect_blade(propeller_coords)
+dmiddle, dhighest, dlowest = d_blade(vect_length, propeller_coords)                     #d of plan ax+by+cx+d = 0
+upper_blade, lower_blade   = blade_alone(propeller_coords, vect_length, dmiddle)        #points of each blades
+vect_out, vect_side, hub_inner_radius = get_major_axis(propeller_coords, vect_length) #main directions
+print("End pre-processing")
 
 
 
+#####################################################################################################
+############################              PROJECTIONS            ####################################
+#####################################################################################################
 
 print("Begin projections")
 
-planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
-
-all_plane_points = get_points(upper_blade, planes, delta)
-
-plot_projection_up_down(all_plane_points[0], all_plane_points[1])
+planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)   #get equations of planes for projection
+all_plane_points = get_points(upper_blade, planes, delta)                  #get points used for each projection
+#plot_projection_up_down(all_plane_points[0], all_plane_points[1])
 #plot_projection_up_down(all_plane_points[2], all_plane_points[3])
+right_param, left_param, right_pts, left_pts = get_all_projections(planes, all_plane_points) #get param, points of projection
 
-one_plane_point = all_plane_points[0]
+print("End projections")
 
-right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
 
-plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, "Aerostar_no_weight")
+#####################################################################################################
+#############################            PARAMETERS            ######################################
+#####################################################################################################
+
+
 

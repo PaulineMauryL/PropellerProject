@@ -5,6 +5,8 @@ from myMathFunction import normalize_vec
 
 
 def center_prop(propeller_coords):
+	'''Center the propeller in (0,0,0) coordinates
+	'''
 	midx = np.mean(propeller_coords["X"])
 	midy = np.mean(propeller_coords["Y"])
 	midz = np.mean(propeller_coords["Z"])
@@ -45,20 +47,28 @@ def rotate(row, rx, rz):
 
 
 def extreme_points(propeller_coords):
+	''' Find points at extremities of propeller
+		INPUT: DataFrame propeller_coords: points of propeller
+		OUTPUT: array of coordinates [x, y, z] for:
+		max_point: points with all maximum coordinates
+		min_point: points with all minimum coordinates
+		middle_point: points at the middle of propeller
+		highest_point: points with highest coordinates in main direction and mean in others
+		lowest_point: points with lowest coordinates in main direction and mean in others
+	'''
+	maxx = np.max(propeller_coords["X"])
+	minx = np.min(propeller_coords["X"])
+	delta_x = maxx - minx
 
-    maxx = np.max(propeller_coords["X"])
-    minx = np.min(propeller_coords["X"])
-    delta_x = maxx - minx
+	maxy = np.max(propeller_coords["Y"])
+	miny = np.min(propeller_coords["Y"])
+	delta_y = maxy - miny
 
-    maxy = np.max(propeller_coords["Y"])
-    miny = np.min(propeller_coords["Y"])
-    delta_y = maxy - miny  
+	maxz = np.max(propeller_coords["Z"])
+	minz = np.min(propeller_coords["Z"])
+	delta_z = maxz - minz
 
-    maxz = np.max(propeller_coords["Z"])
-    minz = np.min(propeller_coords["Z"])
-    delta_z = maxz - minz
-
-    if(delta_x > delta_y and delta_x > delta_z):
+	if(delta_x > delta_y and delta_x > delta_z):
 	    points_maxx = propeller_coords.loc[propeller_coords["X"] == maxx]
 	    maxxz = np.mean(points_maxx["Z"])
 	    maxxy = np.mean(points_maxx["Y"])
@@ -79,7 +89,7 @@ def extreme_points(propeller_coords):
 	    lowest_point = np.asarray([minx, minxminy, minxminz])
 
 
-    elif(delta_y > delta_x and delta_y > delta_z):
+	elif(delta_y > delta_x and delta_y > delta_z):
 	    points_maxy = propeller_coords.loc[propeller_coords["Y"] == maxy]
 	    maxyx = np.mean(points_maxy["X"])
 	    maxyz = np.mean(points_maxy["Z"])
@@ -100,8 +110,7 @@ def extreme_points(propeller_coords):
 	    lowest_point = np.asarray([minyminx, miny, minyminz])
 
 
-
-    elif(delta_z > delta_x and delta_z > delta_y):
+	elif(delta_z > delta_x and delta_z > delta_y):
 	    points_maxz = propeller_coords.loc[propeller_coords["Z"] == maxz]
 	    maxzx = np.mean(points_maxz["X"])
 	    maxzy = np.mean(points_maxz["Y"])
@@ -121,20 +130,21 @@ def extreme_points(propeller_coords):
 	    minzminy = np.min(points_minz["Y"])
 	    lowest_point = np.asarray([minzminx, minzminy, minz])
 
+	else:
+		print("Error in extreme_point of max_info")
 
-    else:
-    	print("Error in extreme_point of max_info")
+	midx = np.mean(propeller_coords["X"])
+	midy = np.mean(propeller_coords["Y"])
+	midz = np.mean(propeller_coords["Z"])
+	middle_point = np.asarray([midx, midy, midz])
 
-    midx = np.mean(propeller_coords["X"])
-    midy = np.mean(propeller_coords["Y"])
-    midz = np.mean(propeller_coords["Z"])
-    middle_point = np.asarray([midx, midy, midz])
-
-	
-    return max_point, min_point, middle_point, highest_point, lowest_point
+	return max_point, min_point, middle_point, highest_point, lowest_point
 
 
-def vect_blade(max_point, min_point):
+def vect_blade(propeller_coords):
+
+    max_point, min_point, _, _, _ = extreme_points(propeller_coords)
+
     vect_length = normalize_vec(max_point - min_point)
     #print(vect_blade)
     #vect_upper = normalize_vec(max_point - middle_point)
@@ -143,11 +153,16 @@ def vect_blade(max_point, min_point):
     return vect_length
 
 
-def d_blade(vect_length, middle_point, highest_point, lowest_point):
+def d_blade(vect_length, propeller_coords):
+
+	_, _, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
+
 	dmiddle  = - middle_point @ vect_length
-	#dmax     = - max_point @ vect_blade
-	#dmin     = - min_point @ vect_blade
 	dhighest = - highest_point @ vect_length
 	dlowest  = - lowest_point @ vect_length
+
+	#dmax     = - max_point @ vect_blade
+	#dmin     = - min_point @ vect_blade
+
 
 	return dmiddle, dhighest, dlowest
