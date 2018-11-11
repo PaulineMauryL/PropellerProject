@@ -1,8 +1,10 @@
 import numpy as np
 import math
 from myMathFunction import normalize_vec
+from prop_info import extreme_points
 
-def get_major_axis(propeller_coords, middle_point, vect_blade):
+def get_major_axis(propeller_coords, vect_blade):
+	_, _, middle_point, _, _ = extreme_points(propeller_coords)
 	dist = (propeller_coords.add(-middle_point)).copy()
 
 	distance = np.zeros( (len(dist),1) ) 
@@ -36,6 +38,7 @@ def get_major_axis(propeller_coords, middle_point, vect_blade):
 	#print(vect_side)
 	vect_side = normalize_vec(vect_side)
 	#print(vect_side)
+
 	hub_inner_radius = (middle_point - a_point) + (middle_point - b_point) + (middle_point - c_point)
 	hub_inner_radius = [i/3 for i in hub_inner_radius]
 	hub_inner_radius = np.linalg.norm(hub_inner_radius)
