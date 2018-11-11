@@ -12,11 +12,19 @@ from new_projections import *
 
 
 print("Begin pre-processing")
+#propeller = pd.read_csv('aerostar_data.csv')
+#delta = 0.08   #aerostar
+
 propeller = pd.read_csv('propeller_data.csv')
+delta = 0.5   #propeller
+
+nb_seg = 4
+
 #plot_pointcloud(propeller)
 
 propeller = center_prop(propeller)
 propeller = align_prop(propeller)
+#print(propeller)
 #plot_pointcloud(propeller)
 print("Aligned")
 
@@ -31,48 +39,20 @@ vect_out, vect_side, hub_inner_radius = get_major_axis(propeller_coords, middle_
 print("Finish pre-processing")
 
 
+
+
 print("Begin projections")
-nb_seg = 3
-size = 10  #propeller
-#size = 3   #aerostar
+
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
-all_plane_points = get_points(propeller_coords, planes, size)
 
+all_plane_points = get_points(upper_blade, planes, delta)
 
-
+plot_projection_up_down(all_plane_points[0], all_plane_points[1])
+#plot_projection_up_down(all_plane_points[2], all_plane_points[3])
 
 one_plane_point = all_plane_points[0]
 
-#right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
-side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
-    
-param_sides = find_separation_plane(one_plane_point.values)
-one_plane_point.to_csv('points0.csv', index = False)
+right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
 
-right_points, left_points = assign_points(param_sides, one_plane_point)
-#right_points.to_csv('right_points_0.csv', index = False)
-#left_points.to_csv('left_points_0.csv', index = False)
+plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, "Aerostar_no_weight")
 
-
-
-one_plane_point = all_plane_points[1]
-
-#right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
-side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
-    
-param_sides = find_separation_plane(one_plane_point.values)
-one_plane_point.to_csv('points1.csv', index = False)
-
-right_points, left_points = assign_points(param_sides, one_plane_point)
-#right_points.to_csv('right_points_1.csv', index = False)
-#left_points.to_csv('left_points_1.csv', index = False)
-
-
-
-right_points = add_border_points(right_points, side1_border, side2_border)
-left_points  = add_border_points(left_points,  side1_border, side2_border)
-    
-right_popt = interpolate_points(right_points)
-left_popt  = interpolate_points(left_points)
-
-#plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, "Aerofoil_weight0.1_cubic_interpolation")
