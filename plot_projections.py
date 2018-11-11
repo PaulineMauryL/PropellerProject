@@ -133,21 +133,38 @@ def plot_interpolation_side(up_right_border, up_left_border, popt, i):
 
 def plot_interpolation_side_with_points(popt, up_right_points, title):  
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    #print(type(up_right_points))
 
-    data = np.c_[up_right_points.values[:,0], up_right_points.values[:,1]]
-    z = function_poly2d(data, *popt)
+    fig.add_subplot(111)
 
-    plt.plot(up_right_points["X"], up_right_points["Y"], z, 'k')
-    #path = optimized_path(all_points, start)
-    #plt.plot(path[:,0], path[:,1], path[:2], 'k')
+    data = up_right_points.values[:,0]
+    y = model_func(data, *popt)
 
-    ax.scatter(up_right_points["X"], up_right_points["Y"], up_right_points["Z"], 'r.', s=10)
+    plt.plot(data, y, 'k')
+
+    plt.scatter(up_right_points["X"], up_right_points["Y"])
 
     plt.title(title)
     plt.show()
 
+
+
+def plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, title):  
+    fig = plt.figure()
+    fig.add_subplot(111)
+
+    data_right = right_points.values[:,0]
+    y_right = model_func(data_right, *right_popt)
+    plt.plot(data_right, y_right, 'k')
+    plt.scatter(right_points["X"], right_points["Y"])
+    
+    data_left = left_points.values[:,0]
+    y_left = model_func(data_left, *left_popt)
+    plt.plot(data_left, y_left, 'k')
+    plt.scatter(left_points["X"], left_points["Y"])
+
+    plt.title(title)
+    plt.show()
+    fig.savefig('Image/' +title + '.png')
 '''
 def optimized_path(coords, start):
     #https://stackoverflow.com/questions/45829155/sort-points-in-order-to-have-a-continuous-curve-using-python
@@ -201,37 +218,3 @@ def plot_interpolation_and_points(df_u, df_d, up_right_points, up_left_points, d
     plt.title('Everyting', fontsize=20)
     plt.show()
 
-
-def plotfit_poly2d(x, y, z, fitparam, title=''):
-    '''
-    Plot the real data and the fitted surface, offsets if required
-    '''
-    import matplotlib.pyplot as plt
-    from matplotlib.mlab import griddata
-    from mpl_toolkits.mplot3d import Axes3D
-    xi = np.linspace(min(x), max(x))
-    yi = np.linspace(min(y), max(y))
-    #It is suggested to install the natgrid matplotlib toolkit
-    #can be downloaded from 
-    #http://sourceforge.net/project/showfiles.php?group_id=80706&package_id=142792
-    #For details go to    
-    #http://matplotlib.sourceforge.net/api/mlab_api.html#matplotlib.mlab.griddata
-    #We grid the data for plotting, using triangulation 
-    z_data = griddata(x, y, z, xi, yi)
-    xim, yim = np.meshgrid(xi, yi)
-    
-    A, B, C, D, E, F = fitparam
-
-    z_fit = function_poly2d((xim, yim), A, B, C, D, E, F)
-   
-    fig = plt.figure()
-    
-    #plot the surfaces
-    ax = Axes3D(fig)
-    ax.plot_surface(xim, yim, z_fit, color='red')   
-    ax.plot_surface(xim, yim, z_data, color='blue', rstride=5, cstride=5) 
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
-    ax.set_title(title)
-    plt.show()  
