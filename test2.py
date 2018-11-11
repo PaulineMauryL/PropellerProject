@@ -17,7 +17,8 @@ propeller = pd.read_csv('propeller_data.csv')
 
 propeller = center_prop(propeller)
 propeller = align_prop(propeller)
-#plot_pointcloud(propeller)
+print(propeller)
+plot_pointcloud(propeller)
 print("Aligned")
 
 propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)
@@ -36,18 +37,21 @@ nb_seg = 3
 size = 10  #propeller
 #size = 3   #aerostar
 planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)
-all_plane_points = get_points(propeller_coords, planes, size)
 
 
+all_plane_points = get_points(upper_blade, planes, size)
 
-
+print(all_plane_points[1])
+plot_pointcloud(all_plane_points[1])
+plot_projection_up_down(all_plane_points[0], all_plane_points[1])
+'''
 one_plane_point = all_plane_points[0]
 
 #right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
 side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
     
 param_sides = find_separation_plane(one_plane_point.values)
-one_plane_point.to_csv('points0.csv', index = False)
+#one_plane_point.to_csv('points0.csv', index = False)
 
 right_points, left_points = assign_points(param_sides, one_plane_point)
 #right_points.to_csv('right_points_0.csv', index = False)
@@ -76,3 +80,5 @@ right_popt = interpolate_points(right_points)
 left_popt  = interpolate_points(left_points)
 
 #plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, "Aerofoil_weight0.1_cubic_interpolation")
+
+'''

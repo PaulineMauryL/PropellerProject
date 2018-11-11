@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from myMathFunction import normalize_vec
 
+
+
 def center_prop(propeller_coords):
 	midx = np.mean(propeller_coords["X"])
 	midy = np.mean(propeller_coords["Y"])
@@ -14,22 +16,33 @@ def center_prop(propeller_coords):
 
 
 def align_prop(propeller_coords):
+	''' Align the propeller: the longest length aligned on the z axis
+		INPUT: dataframe of points
+		OUTPUT: dataframe of aligned points
+	'''
 	_, _, _, highest_point, _ = extreme_points(propeller_coords)
+	print(type(highest_point))
 	rotation_point = highest_point.copy()
 	rotation_point[2] = 0
 
 	theta =  np.arccos( (rotation_point @ [0,1,0]) / (np.linalg.norm(rotation_point) * np.linalg.norm([0,1,0]))) #* 180/np.pi
 	ct, st = np.cos(theta), np.sin(theta)
-	rotz = np.array(((ct,-st, 0), (st, ct, 0), (0,0,1)))
+	rotz = np.array([[ct,-st, 0], [st, ct, 0], [0,0,1]])
 
 	rot_proj = rotz @ highest_point
 	phi =  - np.arccos( (rot_proj @ [0,0,1]) / (np.linalg.norm(rot_proj) * np.linalg.norm([0,0,1]))) #* 180/np.pi
 	cp, sp = np.cos(phi), np.sin(phi)
-	rotx = np.array(((1, 0, 0), (0, cp, -sp), (0,sp,cp)))
+	rotx = np.array([[1, 0, 0], [0, cp, -sp], [0,sp,cp]])
 
-	propeller_coords = propeller_coords.apply(lambda x: rotx @ rotz @ x.values, axis = 1)
-	
+	print(type(propeller_coords))
+	propeller_coords = propeller_coords.apply(rotate, rx = rotx, rz = rotz, axis = 1, result_type = 'broadcast')
+	print(type(propeller_coords))
 	return propeller_coords
+
+
+def rotate(row, rx, rz):
+	return rx @ rz @ np.array([row['X'], row['Y'], row['Z']])
+
 
 def extreme_points(propeller_coords):
 
