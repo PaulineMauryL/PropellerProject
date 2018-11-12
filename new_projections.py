@@ -4,7 +4,7 @@ from prop_info import extreme_points
 import scipy.linalg
 from scipy.optimize import curve_fit
 from myMathFunction import point_on_plane
-from plot_projections import * #plot_interpolation_side
+from plot_projections import plot_projection_up_down #plot_interpolation_side
 
 
 
@@ -71,7 +71,7 @@ def ls_plane(C, X):
     '''
     return C[3]*X**3 + C[2]*X**2 + C[1]*X + C[0]
 
-def model_func(data, a, b, c, d):    
+def model_func(data, a, b, c, d):    ################## CHANGE IN PLOT_PROJECTION TOO
     '''Function to interpolate the edges. Polynomial. 
     INPUT: data: x values because 2d 
             a, b, c, d: parameters to optimize
@@ -138,7 +138,9 @@ def points_of_plane(propeller_coords, plane, delta):
         OUTPUT: Datafreme points to consider
     '''
     index_segment = []
-    threshold = 5
+    #index_segment_dn = []
+
+    threshold = 10
     nb_pts_at_a_time = 0
 
     ## Upper side
@@ -165,10 +167,12 @@ def points_of_plane(propeller_coords, plane, delta):
             index_segment.append(index)
 
 
+
+
     ## Lower side
     old_plane = plane[:]
     new_plane = plane[:] - [0,0,0,delta]
-
+    nb_pts_at_a_time = 0
     while(nb_pts_at_a_time < threshold):   # while less than threshold nb of pts are added at each iteration, continue to add points
         nb_pts_at_a_time = 0
 
@@ -191,7 +195,12 @@ def points_of_plane(propeller_coords, plane, delta):
 
     # Takes both sides points
     plane_points = propeller_coords.loc[index_segment].copy()
-    
+
+    #plane_points_up = propeller_coords.loc[index_segment_up].copy()
+    #plane_points_dn = propeller_coords.loc[index_segment_dn].copy()
+
+    #plot_projection_up_down(plane_points_up, plane_points_dn)
+
     return plane_points.reset_index(drop=True)
 
 

@@ -2,7 +2,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import proj3d
 import matplotlib.pyplot as plt
 from myMathFunction import findMinMaxDF
-from new_projections import *
+#from new_projections import *
 import numpy as np 
 import pandas as pd
 
@@ -41,7 +41,7 @@ def plot_projection_up_down(df_u, df_d):
     ax.set_ylim([downlim, uplim]);
     ax.set_zlim([downlim, uplim]);
     '''   
-    plt.title('Projection on plane', fontsize=20)
+    plt.title('up down', fontsize=20)
     plt.show()
 
 
@@ -125,7 +125,7 @@ def plot_interpolation_side(up_right_border, up_left_border, popt, i):
     range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], 100)
     
     data = np.c_[range_X_up_r, range_Y_up_r]
-    z = function_poly2d(data, *popt)
+    z = model_func(data, *popt)
 
     plt.plot(range_X_up_r, range_Y_up_r, z, 'k')
     plt.title(i)
@@ -146,7 +146,9 @@ def plot_interpolation_side_with_points(popt, up_right_points, title):
     plt.title(title)
     plt.show()
 
+def model_func(data, a, b, c, d):    ################## CHANGE HERE TOO
 
+    return a*data[:]**3 + b*data[:]**2 + c*data[:] + d
 
 def plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, title):  
     fig = plt.figure()
