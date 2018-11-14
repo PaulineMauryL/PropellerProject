@@ -73,3 +73,87 @@ def project_points_on_plane(up_right_pts, dn_right_pts, up_left_pts, dn_left_pts
     proj_left_df  = pd.DataFrame(proj_left,  columns = labels)
     
     return proj_right_df, proj_left_df
+
+
+
+def points_of_plane(propeller_coords, plane, delta, threshold):
+    ''' Get the points to consider for projection on ONE plane
+        INPUT: Dataframe points of blade, 
+                np.array plane equation, 
+                scalar delta
+        OUTPUT: Datafreme points to consider
+    '''
+    index_segment = []
+    index_segment_up = []
+    index_segment_dn = []
+
+    threshold = 20
+    points_taken = 0
+
+    ## Upper side
+    old_plane = plane[:]
+    new_plane = plane[:] + [0,0,0,delta]
+
+    while(points_taken < threshold):   # while less than threshold nb of pts are added at each iteration, continue to add points
+        #nb_pts_at_a_time = 0
+
+        for index, point in propeller_coords.iterrows(): 
+            point_mult = np.append(point, 1)                                #[x, y, z] to [x, y, z, 1]: to multiply with plane [a, b, c, d]
+
+            if(point_mult @ old_plane < 0 and point_mult @ new_plane >= 0): #if point between in interval delta between planes
+                points_taken += 1
+                #print("upper" + index)
+                index_segment.append(index)                                 #take index of point
+                index_segment_up.append(index)  #DEBUG
+
+        old_plane = new_plane[:]
+        new_plane = new_plane[:] + [0,0,0,delta]                            #consider next interval at next iteration
+
+    '''
+    for index, point in propeller_coords.iterrows(): #take a last one in case last iteration was in between a row of pts
+        point_mult = np.append(point, 1)
+        if(point_mult @ old_plane < 0 and point_mult @ new_plane >= 0):
+            index_segment.append(index)
+            index_segment_up.append(index) #DEBUG
+    '''
+
+
+
+    ## Lower side
+    old_plane = plane[:]
+    new_plane = plane[:] - [0,0,0,delta]
+    points_taken = 0
+    while(points_taken < threshold):   # while less than threshold nb of pts are added at each iteration, continue to add points
+        #nb_pts_at_a_time = 0
+
+        for index, point in propeller_coords.iterrows(): 
+            point_mult = np.append(point, 1)                                #[x, y, z] to [x, y, z, 1]: to multiply with plane [a, b, c, d]
+
+            if(point_mult @ old_plane > 0 and point_mult @ new_plane <= 0): #if point between in interval delta between planes
+                points_taken += 1
+                #print("lower" + index)
+                index_segment.append(index)                                 #take index of point
+                index_segment_dn.append(index) #DEBUG
+
+        old_plane = new_plane[:]
+        new_plane = new_plane[:] - [0,0,0,delta]                            #consider next interval at next iteration
+
+    '''
+    for index, point in propeller_coords.iterrows(): #take a last one in case last iteration was in between a row of pts
+        point_mult = np.append(point, 1)
+        if(point_mult @ old_plane > 0 and point_mult @ new_plane <= 0):
+            index_segment.append(index)
+            index_segment_dn.append(index) #DEBUG
+    '''
+
+
+    # Takes both sides points
+    plane_points = propeller_coords.loc[index_segment].copy()
+
+    #DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG
+    #plane_points_up = propeller_coords.loc[index_segment_up].copy()
+    #plane_points_dn = propeller_coords.loc[index_segment_dn].copy()
+    #plot_projection_up_down(plane_points_up, plane_points_dn)
+    #DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG
+
+    return plane_points.reset_index(drop=True)

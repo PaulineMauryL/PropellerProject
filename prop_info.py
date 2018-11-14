@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
+import math
 from myMathFunction import normalize_vec
+
 
 
 
@@ -166,3 +168,14 @@ def d_blade(vect_length, propeller_coords):
 
 
 	return dmiddle, dhighest, dlowest
+
+
+def aerofoil_width(propeller_coords):
+	minx = np.min(propeller_coords["X"])
+	maxx = np.max(propeller_coords["X"])
+	
+	miny = np.min(propeller_coords["Y"])
+	maxy = np.max(propeller_coords["Y"])
+
+	return math.sqrt( (maxx - minx)**2 + (maxy - miny)**2  )
+
