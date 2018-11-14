@@ -18,7 +18,7 @@ from new_projections import *
 #delta = 0.6   #aerostar
 
 propeller = pd.read_csv('propeller_data.csv')
-threshold = 20
+nb_point_each_side = 15
 
 ''' Choose number of aerofoil wanted
 '''
@@ -60,7 +60,7 @@ planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)   #get 
 print("Planes computed")
 #print(len(planes))
 
-all_plane_points = get_points(upper_blade, planes, threshold)                  #get points used for each projection
+all_plane_points = get_points(upper_blade, planes, nb_point_each_side)                  #get points used for each projection
 print("Points selected")
 #print(len(all_plane_points))
 #plot_projection_up_down(all_plane_points[0], all_plane_points[1])
