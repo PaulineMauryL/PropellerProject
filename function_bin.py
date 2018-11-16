@@ -157,3 +157,18 @@ def points_of_plane(propeller_coords, plane, delta, threshold):
     #DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG
 
     return plane_points.reset_index(drop=True)
+
+
+def add_border_points(right_points, one_plane_point):
+    '''Add the border points to the list of points to interpolate 
+    Goal: be more sure that each projection will start and end at same position
+    INPUT: Dataframe points to project
+            np.array coordinates of border points
+    OUTPUT: DataFrame of ordered point to interpolate. (ordered important for plot)
+    '''
+    side1_border, side2_border, _, _, _ = extreme_points(one_plane_point)
+
+    right_points = right_points.append(pd.DataFrame(side1_border.reshape(1, 3), columns = ["X","Y","Z"]))
+    right_points = right_points.append(pd.DataFrame(side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
+
+    return right_points.sort_values('X').reset_index(drop=True)

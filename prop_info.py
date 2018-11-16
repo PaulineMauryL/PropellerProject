@@ -3,7 +3,15 @@ import pandas as pd
 import math
 from myMathFunction import normalize_vec
 
+def prepare_propeller(propeller):
+    propeller = center_prop(propeller)  # center prop: middle in (0,0,0) coordinates
+    propeller = align_prop(propeller)   # longest axis aligned along z-axis
+    propeller = center_prop(propeller)  # re-center prop: slight shift in previous function
 
+    propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)  #remove multiple same points 
+    propeller_coords = propeller_coords.reset_index(drop=True)
+    
+    return propeller_coords
 
 
 def center_prop(propeller_coords):

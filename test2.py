@@ -18,11 +18,11 @@ from new_projections import *
 #delta = 0.6   #aerostar
 
 propeller = pd.read_csv('propeller_data.csv')
-nb_point_each_side = 15
+nb_point_each_side = 20
 
 ''' Choose number of aerofoil wanted
 '''
-nb_seg = 4
+nb_seg = 5
 # --> nbseg+1 plan 
 # --> nbseg-1 projections
 #plot_pointcloud(propeller)
@@ -74,15 +74,14 @@ right_param, left_param, right_pts, left_pts = get_all_projections(planes, all_p
 plot_interpolation_both_sides(right_param[0], right_pts[0], left_param[0], left_pts[0], "propeller_no_weight_0")
 plot_interpolation_both_sides(right_param[1], right_pts[1], left_param[1], left_pts[1], "propeller_no_weight_1")
 plot_interpolation_both_sides(right_param[2], right_pts[2], left_param[2], left_pts[2], "propeller_no_weight_2")
-#plot_interpolation_both_sides(right_param[3], right_pts[3], left_param[3], left_pts[3], "propeller_no_weight_3")
-'''
+plot_interpolation_both_sides(right_param[3], right_pts[3], left_param[3], left_pts[3], "propeller_no_weight_3")
 plot_interpolation_both_sides(right_param[4], right_pts[4], left_param[4], left_pts[4], "propeller_no_weight_4")
 plot_interpolation_both_sides(right_param[5], right_pts[5], left_param[5], left_pts[5], "propeller_no_weight_5")
 plot_interpolation_both_sides(right_param[6], right_pts[6], left_param[6], left_pts[6], "propeller_no_weight_6")
 plot_interpolation_both_sides(right_param[7], right_pts[7], left_param[7], left_pts[7], "propeller_no_weight_7")
 plot_interpolation_both_sides(right_param[8], right_pts[8], left_param[8], left_pts[8], "propeller_no_weight_8")
-plot_interpolation_both_sides(right_param[9], right_pts[9], left_param[9], left_pts[9], "propeller_no_weight_9")
-'''
+#plot_interpolation_both_sides(right_param[9], right_pts[9], left_param[9], left_pts[9], "propeller_no_weight_9")
+
 print("End projections")
 
 

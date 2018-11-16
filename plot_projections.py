@@ -6,6 +6,20 @@ from myMathFunction import findMinMaxDF
 import numpy as np 
 import pandas as pd
 
+
+def points_from_curve(up_right_points, popt):
+    '''
+    INPUT: Dataframe points to plot
+            popt: optimal parameters of interpolation
+    OUTPUT: DataFrame of interpolated points to visualize on plot
+    '''
+    data = np.c_[up_right_points.values[:,0], up_right_points.values[:,1]]
+    z = model_func(data, *popt)
+    up_right_points["Z"] = z
+
+    return up_right_points 
+    
+
 def plot_border(up_right, up_left, dn_right, dn_left):
     fig = plt.figure()
 
