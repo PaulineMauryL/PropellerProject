@@ -6,6 +6,20 @@ from myMathFunction import findMinMaxDF
 import numpy as np 
 import pandas as pd
 
+
+def points_from_curve(up_right_points, popt):
+    '''
+    INPUT: Dataframe points to plot
+            popt: optimal parameters of interpolation
+    OUTPUT: DataFrame of interpolated points to visualize on plot
+    '''
+    data = np.c_[up_right_points.values[:,0], up_right_points.values[:,1]]
+    z = model_func(data, *popt)
+    up_right_points["Z"] = z
+
+    return up_right_points 
+    
+
 def plot_border(up_right, up_left, dn_right, dn_left):
     fig = plt.figure()
 
@@ -25,10 +39,25 @@ def plot_border(up_right, up_left, dn_right, dn_left):
     plt.legend()
     plt.show()
 
+def D2_plot(df_u, df_d, up, y, title):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(df_d["X"], df_d["Y"], 'k*', markersize=3, alpha=0.6)
+    ax.plot(df_u["X"], df_u["Y"], 'r.', markersize=3, alpha=0.6)
+
+    plt.plot(up['X'], y, 'g')
+
+    ax.set_xlabel('X', fontsize=20)
+    ax.set_ylabel('Y', fontsize=20)
+
+    plt.title(title, fontsize=20)
+    plt.show()
+
+
 def plot_projection_up_down(df_u, df_d):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot(df_d["X"], df_d["Y"], df_d["Z"], 'k.', markersize=3, alpha=0.6)
+    ax.plot(df_d["X"], df_d["Y"], df_d["Z"], 'k*', markersize=3, alpha=0.6)
     ax.plot(df_u["X"], df_u["Y"], df_u["Z"], 'r.', markersize=3, alpha=0.6)
 
     ax.set_xlabel('X', fontsize=20)
@@ -161,7 +190,7 @@ def plot_interpolation_both_sides(right_popt, right_points, left_popt, left_poin
     
     data_left = left_points.values[:,0]
     y_left = model_func(data_left, *left_popt)
-    plt.plot(data_left, y_left, 'k')
+    plt.plot(data_left, y_left, 'g')
     plt.scatter(left_points["X"], left_points["Y"])
 
     plt.title(title)

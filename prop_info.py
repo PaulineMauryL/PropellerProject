@@ -1,7 +1,17 @@
 import numpy as np
 import pandas as pd
+import math
 from myMathFunction import normalize_vec
 
+def prepare_propeller(propeller):
+    propeller = center_prop(propeller)  # center prop: middle in (0,0,0) coordinates
+    propeller = align_prop(propeller)   # longest axis aligned along z-axis
+    propeller = center_prop(propeller)  # re-center prop: slight shift in previous function
+
+    propeller_coords = propeller.drop_duplicates(subset=None, keep='first', inplace=False)  #remove multiple same points 
+    propeller_coords = propeller_coords.reset_index(drop=True)
+    
+    return propeller_coords
 
 
 def center_prop(propeller_coords):
@@ -166,3 +176,14 @@ def d_blade(vect_length, propeller_coords):
 
 
 	return dmiddle, dhighest, dlowest
+
+
+def aerofoil_width(propeller_coords):
+	minx = np.min(propeller_coords["X"])
+	maxx = np.max(propeller_coords["X"])
+	
+	miny = np.min(propeller_coords["Y"])
+	maxy = np.max(propeller_coords["Y"])
+
+	return math.sqrt( (maxx - minx)**2 + (maxy - miny)**2  )
+
