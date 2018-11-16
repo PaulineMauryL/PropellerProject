@@ -18,7 +18,7 @@ from new_projections import *
 #delta = 0.6   #aerostar
 
 propeller = pd.read_csv('propeller_data.csv')
-nb_point_each_side = 20
+nb_point = 30
 
 ''' Choose number of aerofoil wanted
 '''
@@ -60,7 +60,7 @@ planes = get_planes(upper_blade, dmiddle, dhighest, vect_length, nb_seg)   #get 
 print("Planes computed")
 #print(len(planes))
 
-all_plane_points = get_points(upper_blade, planes, nb_point_each_side)                  #get points used for each projection
+all_plane_points = get_points(upper_blade, planes, nb_point)                  #get points used for each projection
 print("Points selected")
 #print(len(all_plane_points))
 #plot_projection_up_down(all_plane_points[0], all_plane_points[1])
@@ -71,16 +71,9 @@ right_param, left_param, right_pts, left_pts = get_all_projections(planes, all_p
 #print(type(right_pts))
 #print(right_pts)
 
-plot_interpolation_both_sides(right_param[0], right_pts[0], left_param[0], left_pts[0], "propeller_no_weight_0")
-plot_interpolation_both_sides(right_param[1], right_pts[1], left_param[1], left_pts[1], "propeller_no_weight_1")
-plot_interpolation_both_sides(right_param[2], right_pts[2], left_param[2], left_pts[2], "propeller_no_weight_2")
-plot_interpolation_both_sides(right_param[3], right_pts[3], left_param[3], left_pts[3], "propeller_no_weight_3")
-plot_interpolation_both_sides(right_param[4], right_pts[4], left_param[4], left_pts[4], "propeller_no_weight_4")
-plot_interpolation_both_sides(right_param[5], right_pts[5], left_param[5], left_pts[5], "propeller_no_weight_5")
-plot_interpolation_both_sides(right_param[6], right_pts[6], left_param[6], left_pts[6], "propeller_no_weight_6")
-plot_interpolation_both_sides(right_param[7], right_pts[7], left_param[7], left_pts[7], "propeller_no_weight_7")
-plot_interpolation_both_sides(right_param[8], right_pts[8], left_param[8], left_pts[8], "propeller_no_weight_8")
-#plot_interpolation_both_sides(right_param[9], right_pts[9], left_param[9], left_pts[9], "propeller_no_weight_9")
+for i in range(5):
+plot_interpolation_both_sides(right_param[i], right_pts[i], left_param[i], left_pts[i], "propeller_no_weight_" + str(i))
+
 
 print("End projections")
 
