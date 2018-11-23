@@ -69,3 +69,73 @@ def least_squares(y, tx):
     return np.linalg.solve(a, b)
 
 
+
+def ls_plane(C, X):
+    '''Least square equation to find the best line to separate the data
+    '''
+    return C[3]*X**3 + C[2]*X**2 + C[1]*X + C[0]
+    
+
+
+def func_2(data, a, b, c)  :   
+    '''Function to interpolate the edges. Polynomial. 
+    INPUT: data: x values because 2d 
+            a, b, c, d: parameters to optimize
+    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
+    '''
+    return a*data[:]**2 + b*data[:] + c
+
+
+def func_3(data, a, b, c, d):   
+    '''Function to interpolate the edges. Polynomial. 
+    INPUT: data: x values because 2d 
+            a, b, c, d: parameters to optimize
+    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
+    '''
+    return a*data[:]**3 + b*data[:]**2 + c*data[:] + d
+
+
+
+
+def func_4(data, a, b, c, d, e):   
+    '''Function to interpolate the edges. Polynomial. 
+    INPUT: data: x values because 2d 
+            a, b, c, d: parameters to optimize
+    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
+    '''
+    return a*data[:]**4 + b*data[:]**3 + c*data[:]**2 + d*data[:] + e
+
+def func_4_scalar(data, a, b, c, d, e):    
+    '''Function to interpolate the edges. Polynomial. 
+    INPUT: data: x values because 2d 
+            a, b, c, d: parameters to optimize
+    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
+    '''
+    return a*data**4 + b*data**3 + c*data**2 + d*data + e
+
+
+
+
+def func_5(data, a, b, c, d, e, f):  
+    '''Function to interpolate the edges. Polynomial. 
+    INPUT: data: x values because 2d 
+            a, b, c, d: parameters to optimize
+    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
+    '''
+    return a*data[:]**5 + b*data[:]**4 + c*data[:]**3 + d*data[:]**2 + e*data[:] + f
+
+def func_6(data, a, b, c, d, e, f, g):   
+    '''Function to interpolate the edges. Polynomial. 
+    INPUT: data: x values because 2d 
+            a, b, c, d: parameters to optimize
+    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
+    '''
+    return a*data[:]**6 + b*data[:]**5 + c*data[:]**4 + d*data[:]**3 + e*data[:]**2 + f*data[:] + g
+
+def func_7(data, a, b, c, d, e, f, g, h):   
+    '''Function to interpolate the edges. Polynomial. 
+    INPUT: data: x values because 2d 
+            a, b, c, d: parameters to optimize
+    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
+    '''
+    return a*data[:]**7 + b*data[:]**6 + c*data[:]**5 + d*data[:]**4 + e*data[:]**3 + f*data[:]**2 + g*data[:] + h
