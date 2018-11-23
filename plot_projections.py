@@ -1,7 +1,7 @@
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import proj3d
 import matplotlib.pyplot as plt
-from myMathFunction import findMinMaxDF
+from myMathFunction import findMinMaxDF, func_4
 #from new_projections import *
 import numpy as np 
 import pandas as pd
@@ -14,7 +14,7 @@ def points_from_curve(up_right_points, popt):
     OUTPUT: DataFrame of interpolated points to visualize on plot
     '''
     data = np.c_[up_right_points.values[:,0], up_right_points.values[:,1]]
-    z = model_func(data, *popt)
+    z = func_4(data, *popt)
     up_right_points["Z"] = z
 
     return up_right_points 
@@ -154,7 +154,7 @@ def plot_interpolation_side(up_right_border, up_left_border, popt, i):
     range_Y_up_r = np.linspace(up_right_border[1], up_left_border[1], 100)
     
     data = np.c_[range_X_up_r, range_Y_up_r]
-    z = model_func(data, *popt)
+    z = func_4(data, *popt)
 
     plt.plot(range_X_up_r, range_Y_up_r, z, 'k')
     plt.title(i)
@@ -166,7 +166,7 @@ def plot_interpolation_side_with_points(popt, up_right_points, title):
     fig.add_subplot(111)
 
     data = up_right_points.values[:,0]
-    y = model_func(data, *popt)
+    y = func_4(data, *popt)
 
     plt.plot(data, y, 'k')
 
@@ -175,27 +175,28 @@ def plot_interpolation_side_with_points(popt, up_right_points, title):
     plt.title(title)
     plt.show()
 
-def model_func(data, a, b, c, d):    ################## CHANGE HERE TOO
+#def model_func(data, a, b, c, d):    ################## CHANGE HERE TOO
 
-    return a*data[:]**3 + b*data[:]**2 + c*data[:] + d
+ #   return a*data[:]**3 + b*data[:]**2 + c*data[:] + d
 
 def plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, title):  
     fig = plt.figure()
     fig.add_subplot(111)
 
     data_right = right_points.values[:,0]
-    y_right = model_func(data_right, *right_popt)
+    y_right = func_4(data_right, *right_popt)
     plt.plot(data_right, y_right, 'k')
     plt.scatter(right_points["X"], right_points["Y"])
     
     data_left = left_points.values[:,0]
-    y_left = model_func(data_left, *left_popt)
+    y_left = func_4(data_left, *left_popt)
     plt.plot(data_left, y_left, 'g')
     plt.scatter(left_points["X"], left_points["Y"])
 
     plt.title(title)
     plt.show()
     fig.savefig('Image/' + title + '.png')
+
 '''
 def optimized_path(coords, start):
     #https://stackoverflow.com/questions/45829155/sort-points-in-order-to-have-a-continuous-curve-using-python

@@ -4,7 +4,7 @@ import math
 from prop_info import extreme_points, aerofoil_width
 import scipy.linalg
 from scipy.optimize import curve_fit
-from myMathFunction import point_on_plane
+from myMathFunction import *
 from plot_projections import plot_projection_up_down, D2_plot #plot_interpolation_side
 
 
@@ -17,10 +17,9 @@ def points_of_plane(propeller_coords, plane):
                 scalar delta
         OUTPUT: Dataframe points to consider
     '''
-    threshold = 25
+    threshold = 30
     delta = 0.1
-
-	max_aerofoil_width = aerofoil_width(propeller_coords)
+    max_aerofoil_width = aerofoil_width(propeller_coords)
 
     old_plane_above = plane[:]
     old_plane_below = plane[:]
@@ -67,7 +66,7 @@ def points_of_plane(propeller_coords, plane):
                 for _, already_taken in taken.iterrows(): 
                     distance = math.sqrt( (point[0] - already_taken[0])**2 + (point[1] - already_taken[1])**2 )
 
-                    if(  distance < (max_aerofoil_width/50)  ): #if not far enough of already taken
+                    if(  distance < (max_aerofoil_width/100)  ): #if not far enough of already taken
                         to_add = False
 
                 if(to_add):
@@ -81,7 +80,9 @@ def points_of_plane(propeller_coords, plane):
         above_plane = above_plane[:] + [0,0,0,delta]                            #consider next interval at next iteration
 
         old_plane_below = below_plane[:]
-        below_plane = below_plane[:] - [0,0,0,delta]                            #consider next interval at next iteration    
+        below_plane = below_plane[:] - [0,0,0,delta]                            #consider next interval at next iteration  
+
+        threshold -= 1
 
 
     # Takes both sides points
@@ -131,10 +132,6 @@ def find_separation_plane(data):
     return C
 
 
-def ls_plane(C, X):
-    '''Least square equation to find the best line to separate the data
-    '''
-    return C[3]*X**3 + C[2]*X**2 + C[1]*X + C[0]
 
 
 def assign_points(C_up, up):
@@ -179,13 +176,14 @@ def interpolate_points(up1):
     '''
     x = up1.values[:,0]
     y = up1.values[:,1]
-
-    errors = []
-    parameters = []
+    print("length of x")
+    print(len(x))
+    #errors = []
+    #parameters = []
     #sigma = np.ones(len(x))
     #sigma[[-1, -2]] = 1  #assign more weight to border points
     #print("error of funct_{} is {}".format(i, np.sqrt( np.diag(pcov) )))
-    popt_3, pcov_3 = curve_fit(func_3, x, y) 
+    popt_4, _ = curve_fit(func_4, x, y) 
     
     '''
     errors.append(np.sqrt( np.diag(pcov_2) ))   #compute one standard deviation errors on the parameters
@@ -217,57 +215,10 @@ def interpolate_points(up1):
 
     popt = parameters[min_error]
     '''
-    return popt_3 #, degree
+    return popt_4 #, degree
 
 
-def func_2(data, a, b, c)  :    ################## CHANGE IN PLOT_PROJECTION TOO
-    '''Function to interpolate the edges. Polynomial. 
-    INPUT: data: x values because 2d 
-            a, b, c, d: parameters to optimize
-    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
-    '''
-    return a*data[:]**2 + b*data[:] + c
 
-
-def func_3(data, a, b, c, d):    ################## CHANGE IN PLOT_PROJECTION TOO
-    '''Function to interpolate the edges. Polynomial. 
-    INPUT: data: x values because 2d 
-            a, b, c, d: parameters to optimize
-    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
-    '''
-    return a*data[:]**3 + b*data[:]**2 + c*data[:] + d
-
-def func_4(data, a, b, c, d, e):    ################## CHANGE IN PLOT_PROJECTION TOO
-    '''Function to interpolate the edges. Polynomial. 
-    INPUT: data: x values because 2d 
-            a, b, c, d: parameters to optimize
-    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
-    '''
-    return a*data[:]**4 + b*data[:]**3 + c*data[:]**2 + d*data[:] + e
-
-def func_5(data, a, b, c, d, e, f):    ################## CHANGE IN PLOT_PROJECTION TOO
-    '''Function to interpolate the edges. Polynomial. 
-    INPUT: data: x values because 2d 
-            a, b, c, d: parameters to optimize
-    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
-    '''
-    return a*data[:]**5 + b*data[:]**4 + c*data[:]**3 + d*data[:]**2 + e*data[:] + f
-
-def func_6(data, a, b, c, d, e, f, g):    ################## CHANGE IN PLOT_PROJECTION TOO
-    '''Function to interpolate the edges. Polynomial. 
-    INPUT: data: x values because 2d 
-            a, b, c, d: parameters to optimize
-    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
-    '''
-    return a*data[:]**6 + b*data[:]**5 + c*data[:]**4 + d*data[:]**3 + e*data[:]**2 + f*data[:] + g
-
-def func_7(data, a, b, c, d, e, f, g, h):    ################## CHANGE IN PLOT_PROJECTION TOO
-    '''Function to interpolate the edges. Polynomial. 
-    INPUT: data: x values because 2d 
-            a, b, c, d: parameters to optimize
-    OUTPUT: results of the function y = f(x) = a*x^3 + b*x^2+ c*x + d 
-    '''
-    return a*data[:]**7 + b*data[:]**6 + c*data[:]**5 + d*data[:]**4 + e*data[:]**3 + f*data[:]**2 + g*data[:] + h
 
 #################################################################################################################
 #################################################################################################################
@@ -313,9 +264,12 @@ def get_all_projections(planes, all_planes_points):
     left_pts = []
     right_deg = []
     left_deg = []
-
+    i=0
     for one_plane_point in all_planes_points:
+        print("Number "+str(i))
+        i=i+1
         right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
+        print(" \n")
 
         right_param.append(right_popt)
         left_param.append(left_popt)
