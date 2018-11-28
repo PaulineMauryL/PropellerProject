@@ -3,6 +3,7 @@ import numpy as np
 import math
 from myMathFunction import distance_p2p, normalize_vec, func_4_scalar
 from prop_info import extreme_points, get_major_axis
+from prop_info import extreme_points
 from plot_param import *
 
 
@@ -29,13 +30,18 @@ def get_chord_length(right_param, left_param, right_pts, left_pts):
 
     for right, popt_right, left, popt_left in zip(right_pts, right_param, left_pts, left_param):
         
-        highest_point_r, lowest_point_r = get_interpolated_points(right, popt_right)
-        distance_r = distance_p2p(highest_point_r, lowest_point_r)
-        
-        highest_point_l, lowest_point_l = get_interpolated_points(left, popt_left)
-        distance_l = distance_p2p(highest_point_l, lowest_point_l)
+        if(type(popt_right) == int or type(popt_left) == int):
+            #chord_length.append('NaN')
+            pass
 
-        chord_length.append( max(distance_r, distance_l) ) 
+        else:
+            highest_point_r, lowest_point_r = get_interpolated_points(right, popt_right)
+            distance_r = distance_p2p(highest_point_r, lowest_point_r)
+            
+            highest_point_l, lowest_point_l = get_interpolated_points(left, popt_left)
+            distance_l = distance_p2p(highest_point_l, lowest_point_l)
+
+            chord_length.append( max(distance_r, distance_l) ) 
 
     return chord_length
 
@@ -47,20 +53,24 @@ def get_blade_twist(right_param, left_param, right_pts, left_pts):
     blade_twist = []
 
     for right, popt_right, left, popt_left in zip(right_pts, right_param, left_pts, left_param):
+        if(type(popt_right) == int or type(popt_left) == int):
+            #blade_twist.append('NaN')
+            pass
 
-        highest_point_r, lowest_point_r = get_interpolated_points(right, popt_right)
-        direction_r = highest_point_r - lowest_point_r
+        else:
+            highest_point_r, lowest_point_r = get_interpolated_points(right, popt_right)
+            direction_r = highest_point_r - lowest_point_r
 
-        highest_point_l, lowest_point_l = get_interpolated_points(left, popt_left)
-        direction_l = highest_point_l - lowest_point_l
+            highest_point_l, lowest_point_l = get_interpolated_points(left, popt_left)
+            direction_l = highest_point_l - lowest_point_l
 
-        direction = direction_l
-        direction[0] = (direction_r[0] + direction_l[0]) / 2
-        direction[1] = (direction_r[1] + direction_l[1]) / 2
+            direction = direction_l
+            direction[0] = (direction_r[0] + direction_l[0]) / 2
+            direction[1] = (direction_r[1] + direction_l[1]) / 2
 
-        angle =  math.acos( direction[0] / math.sqrt(direction[0]**2 + direction[1]**2) ) * 180 / math.pi
-        #print(angle)
-        blade_twist.append(angle)
+            angle =  math.acos( direction[0] / math.sqrt(direction[0]**2 + direction[1]**2) ) * 180 / math.pi
+            #print(angle)
+            blade_twist.append(angle)
 
     return blade_twist
 
@@ -96,6 +106,7 @@ def get_hub_points(propeller_coords, dmiddle, vect_length):
             #print("here")
     hub_points = propeller_coords.loc[index_segment].copy()
     hub = hub_points.reset_index(drop=True)
+
     return hub
 
 '''
@@ -122,14 +133,26 @@ def find_hub_radius(middle_point, hub_inner_radius, vect_side, hub_points):
 
 
 def get_hub_inner_radius(propeller_coords, vect_length):
-    _, _, a_point, b_point, c_point = get_major_axis(propeller_coords, vect_length)
-    _, _, middle_point, _, _= extreme_points(propeller_coords)
+	a, b, middle_point, c, d= extreme_points(propeller_coords)
 
-    hub_inner_radius = (middle_point - a_point) + (middle_point - b_point) + (middle_point - c_point)
-    hub_inner_radius = [i/3 for i in hub_inner_radius]
-    hub_inner_radius = np.linalg.norm(hub_inner_radius)
+	dist = (propeller_coords.add(-middle_point)).copy()
 
-    return hub_inner_radius
+	distance = np.zeros( (len(dist), 1) ) 
+
+	for i, elem in dist.iterrows():
+	    distance[i] = math.sqrt(elem['X']**2 + elem['Y']**2 + elem['Z']**2)
+
+	values, index = np.unique(distance, return_index=True)
+
+	a_point = np.asarray(propeller_coords.loc[index[0]])
+	b_point = np.asarray(propeller_coords.loc[index[1]])
+	c_point = np.asarray(propeller_coords.loc[index[2]])
+
+	hub_inner_radius = (middle_point - a_point) + (middle_point - b_point) + (middle_point - c_point)
+	hub_inner_radius = [i/3 for i in hub_inner_radius]
+	hub_inner_radius = np.linalg.norm(hub_inner_radius)
+
+	return hub_inner_radius
 
 
 ######################################################################################
@@ -154,13 +177,15 @@ def get_hub_radius(hub, middle_point, hub_inner_radius, vect_side):
     return outer_point, inner_point
 
 
-def param_hub_radius(propeller_coords, dmiddle, vect_length):
+def param_hub_radius(propeller_coords, vect_length):
     
     _, _, middle_point, _, _ = extreme_points(propeller_coords)
-    vect_out, vect_side, hub_inner_radius = get_major_axis(propeller_coords, vect_length)   #main directions
 
+    dmiddle  = - middle_point @ vect_length
     hub_points = get_hub_points(propeller_coords, dmiddle, vect_length)
-    
+
+    hub_inner_radius = get_hub_inner_radius(propeller_coords, vect_length)
+    _, vect_side = get_major_axis(propeller_coords, vect_length)   #main directions   
     outer_point, inner_point = get_hub_radius(hub_points, middle_point, hub_inner_radius, vect_side)
     
     #hub_radius = hub_outer_radius[2] - middle_point[2]  #from center to exterior radius

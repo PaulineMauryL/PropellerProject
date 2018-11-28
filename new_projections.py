@@ -10,16 +10,22 @@ from plot_projections import plot_projection_up_down, D2_plot #plot_interpolatio
 
 
 
-def points_of_plane(propeller_coords, plane):
+def points_of_plane(propeller_coords, plane, nb_projections, plane_nb):
     ''' Get the points to consider for projection on ONE plane
         INPUT: Dataframe points of blade, 
                 np.array plane equation, 
                 scalar delta
         OUTPUT: Dataframe points to consider
     '''
-    threshold = 30
     delta = 0.1
     max_aerofoil_width = aerofoil_width(propeller_coords)
+
+    if(plane_nb < nb_projections/10):
+        threshold = 5
+    elif(plane_nb > nb_projections-2):
+        threshold = 25
+    else:
+        threshold = 30
 
     old_plane_above = plane[:]
     old_plane_below = plane[:]
@@ -84,7 +90,7 @@ def points_of_plane(propeller_coords, plane):
 
         threshold -= 1
 
-
+    #print(threshold)  # --> around 19 to 21 taken instead of 30
     # Takes both sides points
     plane_points = propeller_coords.loc[index_segment].copy()
 
@@ -100,12 +106,13 @@ def get_points(propeller_coords, planes):
     OUTPUT: List of Dataframe, one dataframe of points for each plane 
     '''
     points = []
+    nb_projections = len(planes) - 2
 
     for i, plane in enumerate(planes):
         if(i==0 or i == (len(planes)-1)):   #do not take into account first plane (hub) and last plane (extremity)
             pass
         else:
-            points.append( points_of_plane(propeller_coords, plane) )
+            points.append( points_of_plane(propeller_coords, plane, nb_projections, i) )
             print("Points of plane {}".format(i))
 
     return points
@@ -156,12 +163,7 @@ def assign_points(C_up, up):
     right_points = (up.loc[right]).reset_index(drop=True)
     left_points  = (up.loc[left] ).reset_index(drop=True)
 
-    #DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG
-    #plot_projection_up_down(right_points, left_points)
-    #D2_plot(right_points, left_points, up, y_all, "Assign points")
-    #DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG#DEBUG
-
-    return right_points.sort_values('X').reset_index(drop=True), left_points.sort_values('X').reset_index(drop=True)
+    return right_points, left_points
 
 #################################################################################################################
 #################################################################################################################
@@ -176,8 +178,9 @@ def interpolate_points(up1):
     '''
     x = up1.values[:,0]
     y = up1.values[:,1]
-    print("length of x")
-    print(len(x))
+    
+    #print("length of x")
+    #print(len(x))
     #errors = []
     #parameters = []
     #sigma = np.ones(len(x))
@@ -185,39 +188,27 @@ def interpolate_points(up1):
     #print("error of funct_{} is {}".format(i, np.sqrt( np.diag(pcov) )))
     popt_4, _ = curve_fit(func_4, x, y) 
     
-    '''
-    errors.append(np.sqrt( np.diag(pcov_2) ))   #compute one standard deviation errors on the parameters
-    parameters.append(popt_2)
-    
-    popt_3, pcov_3 = curve_fit(func_3, x, y) 
-    errors.append(np.sqrt( np.diag(pcov_3) ))   #compute one standard deviation errors on the parameters
-    parameters.append(popt_3)
-
-    popt_4, pcov_4 = curve_fit(func_4, x, y) 
-    errors.append(np.sqrt( np.diag(pcov_4) ))   #compute one standard deviation errors on the parameters
-    parameters.append(popt_4)
-
-    popt_5, pcov_5 = curve_fit(func_5, x, y) 
-    errors.append(np.sqrt( np.diag(pcov_5) ))   #compute one standard deviation errors on the parameters
-    parameters.append(popt_5)
-
-    popt_6, pcov_6 = curve_fit(func_6, x, y) 
-    errors.append(np.sqrt( np.diag(pcov_6) ))   #compute one standard deviation errors on the parameters
-    parameters.append(popt_6)
-
-    popt_7, pcov_7 = curve_fit(func_7, x, y) 
-    errors.append(np.sqrt( np.diag(pcov_7) ))   #compute one standard deviation errors on the parameters
-    parameters.append(popt_7)
-
-    print(errors)
-    min_error = errors.index( min(errors) )
-    degree = min_error + 2
-
-    popt = parameters[min_error]
-    '''
     return popt_4 #, degree
 
+#################################################################################################################
+#################################################################################################################
+#################################################################################################################
+def add_border_points(right_points, left_points):  
+    #add extreme points to have same extremity on both sides
+    _, _, _, high_right, low_right = extreme_points(right_points)
+    _, _, _, high_left, low_left = extreme_points(left_points)
 
+    if(high_right[0] > high_left[0]):
+        left_points.loc[len(left_points)] = high_right
+    else:
+        right_points.loc[len(right_points)] = high_left
+
+    if(low_right[0] < low_left[0]):
+        left_points.loc[len(left_points)] = low_right
+    else:
+        right_points.loc[len(right_points)] = low_left
+
+    return right_points.sort_values('X').reset_index(drop=True), left_points.sort_values('X').reset_index(drop=True) #sort for plot
 
 
 #################################################################################################################
@@ -236,14 +227,19 @@ def projection_results(one_plane_point):
     param_sides = find_separation_plane(one_plane_point.values)
     right_points, left_points = assign_points(param_sides, one_plane_point)
     
-    #right_points = add_border_points(right_points, one_plane_point)
-    #left_points  = add_border_points(left_points, one_plane_point)
+    right_points, left_points = add_border_points(right_points, left_points) #for continuity
     
     #right_points.to_csv(name + 'right_points_1.csv', index = False)
     #left_points.to_csv(name + 'left_points_1.csv', index = False)
+    if(len(right_points)> 5):
+        right_popt = interpolate_points(right_points)
+    else:
+        right_popt = -1
 
-    right_popt = interpolate_points(right_points)
-    left_popt = interpolate_points(left_points)
+    if(len(left_points)> 5):
+        left_popt = interpolate_points(left_points)
+    else:
+        left_popt = -1
     
     return right_popt, right_points, left_popt, left_points #, right_func_deg, left_func_deg
 
@@ -262,20 +258,32 @@ def get_all_projections(planes, all_planes_points):
     left_param = []
     right_pts = []
     left_pts = []
-    right_deg = []
-    left_deg = []
+
     i=0
     for one_plane_point in all_planes_points:
-        print("Number "+str(i))
+        #print("Number "+str(i))
         i=i+1
         right_popt, right_points, left_popt, left_points = projection_results(one_plane_point)
-        print(" \n")
+        #print(" \n")
 
         right_param.append(right_popt)
         left_param.append(left_popt)
         right_pts.append(right_points)
         left_pts.append(left_points)
-        #right_deg.append(right_func_deg)
-        #left_deg.append(left_func_deg)
 
-    return right_param, left_param, right_pts, left_pts #, right_deg, left_deg
+
+    return right_param, left_param, right_pts, left_pts
+
+
+#################################################################################################################
+#################################################################################################################
+#################################################################################################################
+
+def generate_points(right_popt, right_points, left_popt, left_points):
+    _, _, _, highest, lowest = extreme_points(right_points)
+    x = np.linspace(lowest[0], highest[0], 100)
+
+    y_right = func_4(x, *right_popt)
+    y_left = func_4(x, *left_popt)
+
+    return x, y_right, y_left
