@@ -13,9 +13,9 @@ def prepare_propeller(propeller):
     propeller = align_prop_length(propeller)      # longest axis aligned along z-axis
     propeller = center_prop(propeller)     # re-center prop: slight shift in previous function
 
-    vect_length                  = vect_blade(propeller)
-    vect_out, vect_side, _, _, _ = get_major_axis(propeller, vect_length)     #main directions   #former hub_inner_radius (put in function later)
-    propeller                    = align_prop_side(propeller, vect_side) 
+    vect_length         = vect_blade(propeller)
+    vect_out, vect_side = get_major_axis(propeller, vect_length)     #main directions   #former hub_inner_radius (put in function later)
+    propeller           = align_prop_side(propeller, vect_side) 
 
     return propeller, vect_length, vect_out, vect_side
 
@@ -251,4 +251,4 @@ def get_major_axis(propeller_coords, vect_blade):
 	vect_side = normalize_vec(vect_side)
 	#print(vect_side)
 
-	return vect_out, vect_side, a_point, b_point, c_point
+	return vect_out, vect_side

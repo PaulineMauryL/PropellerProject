@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -40,9 +39,9 @@ propeller = center_prop(propeller)  # re-center prop: slight shift in previous f
 #plot_pointcloud(propeller)
 #print("Aligned")
 
-vect_length                  = vect_blade(propeller_coords)
-vect_out, vect_side, _, _, _ = get_major_axis(propeller_coords, vect_length)     #main directions   #former hub_inner_radius (put in function later)
-propeller_coords             = align_prop_side(propeller_coords) 
+vect_length         = vect_blade(propeller_coords)
+vect_out, vect_side = get_major_axis(propeller_coords, vect_length)     #main directions   #former hub_inner_radius (put in function later)
+propeller_coords    = align_prop_side(propeller_coords) 
 
 dmiddle, dhighest, dlowest   = d_blade(vect_length, propeller_coords)                     #d of plan ax+by+cx+d = 0
 upper_blade, lower_blade     = blade_alone(propeller_coords, vect_length, dmiddle)        #points of each blades

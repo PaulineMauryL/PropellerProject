@@ -2,6 +2,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import proj3d
 import matplotlib.pyplot as plt
 from myMathFunction import findMinMaxDF, func_4
+from prop_info import extreme_points
 #from new_projections import *
 import numpy as np 
 import pandas as pd
@@ -179,23 +180,35 @@ def plot_interpolation_side_with_points(popt, up_right_points, title):
 
  #   return a*data[:]**3 + b*data[:]**2 + c*data[:] + d
 
-def plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, title):  
-    fig = plt.figure()
-    fig.add_subplot(111)
+def plot_interpolation_both_sides(right_popt, right_points, left_popt, left_points, i, title):      
 
-    data_right = right_points.values[:,0]
-    y_right = func_4(data_right, *right_popt)
-    plt.plot(data_right, y_right, 'k')
-    plt.scatter(right_points["X"], right_points["Y"])
-    
-    data_left = left_points.values[:,0]
-    y_left = func_4(data_left, *left_popt)
-    plt.plot(data_left, y_left, 'g')
-    plt.scatter(left_points["X"], left_points["Y"])
+    if(type(right_popt) == int or type(left_popt) == int):
+        print("Plane {} does not have enough points for interpolation".format(i))
 
-    plt.title(title)
-    plt.show()
-    fig.savefig('Image/' + title + '.png')
+    else:
+        fig = plt.figure()
+        fig.add_subplot(111)
+        
+        _, _, _, highest, lowest = extreme_points(right_points)
+        x = np.linspace(lowest[0], highest[0], 100)
+
+        #data_right = right_points.values[:,0]
+        y_right = func_4(x, *right_popt)
+        plt.scatter(x, y_right)
+        plt.scatter(right_points["X"], right_points["Y"])
+        
+        #data_left = left_points.values[:,0]
+        y_left = func_4(x, *left_popt)
+        plt.scatter(x, y_left)
+        plt.scatter(left_points["X"], left_points["Y"])
+
+        plt.xlabel('x_values', fontsize=15)
+        plt.ylabel('y_values', fontsize=15)
+
+        plt.title(title)
+        plt.axis([-25, 15, -6, 6])
+        plt.show()
+        fig.savefig('Image/' + title + '.png')
 
 '''
 def optimized_path(coords, start):
@@ -223,6 +236,7 @@ def plot_xyz_table(interpolated_pts_up):
     plt.plot(interpolated_pts_up[:, 0], interpolated_pts_up[:, 1], interpolated_pts_up[:, 2], 'k')
     plt.title("Points from interpolation")
     plt.show()
+
 
 
 def plot_interpolation_and_points(df_u, df_d, up_right_points, up_left_points, dn_right_points, dn_left_points):
