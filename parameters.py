@@ -3,7 +3,6 @@ import numpy as np
 import math
 from myMathFunction import distance_p2p, normalize_vec, func_4_scalar
 from prop_info import extreme_points, get_major_axis
-from prop_info import extreme_points
 from plot_param import *
 
 
@@ -20,7 +19,23 @@ def get_interpolated_points(right, popt):
 
     return highest_point, lowest_point
 
+def get_chord_length(x, y_right, y_left):
+    chord_length = []
 
+    lowest_point = np.zeros([2, 1])
+    lowest_point[0] = x[0]
+    lowest_point[1] = np.mean(y_right[0], y_left[0])
+
+    highest_point = np.zeros([2, 1])
+    highest_point[0] = x[-1]
+    highest_point[1] = np.mean(y_right[-1], y_left[-1])
+    
+    length = distance_p2p(highest_point, lowest_point)
+        
+
+    chord_length.append( length ) 
+
+    return chord_length
 
 ######################################################################################
 #################################    CHORD LENGTH   ##################################
@@ -79,10 +94,10 @@ def get_blade_twist(right_param, left_param, right_pts, left_pts):
 #################################     TIP RADIUS    ##################################
 ######################################################################################
 
-def get_tip_radius(propeller_coords):
+def get_tip_radius(propeller_coords):  # say in report that mean with lowest
     
-    _, _, middle_point, highest_point, _ = extreme_points(propeller_coords)
-    tip_radius = np.linalg.norm(highest_point - middle_point)
+    _, _, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
+    tip_radius = ( np.linalg.norm(highest_point - middle_point) + np.linalg.norm(lowest_point - middle_point) )/2
     
     return tip_radius
 
@@ -106,7 +121,7 @@ def get_hub_points(propeller_coords, dmiddle, vect_length):
             #print("here")
     hub_points = propeller_coords.loc[index_segment].copy()
     hub = hub_points.reset_index(drop=True)
-
+    
     return hub
 
 '''
@@ -181,8 +196,8 @@ def param_hub_radius(propeller_coords, vect_length):
     
     _, _, middle_point, _, _ = extreme_points(propeller_coords)
 
-    dmiddle  = - middle_point @ vect_length
-    hub_points = get_hub_points(propeller_coords, dmiddle, vect_length)
+    dmiddle     = - middle_point @ vect_length
+    hub_points  = get_hub_points(propeller_coords, dmiddle, vect_length)
 
     hub_inner_radius = get_hub_inner_radius(propeller_coords, vect_length)
     _, vect_side = get_major_axis(propeller_coords, vect_length)   #main directions   
