@@ -253,13 +253,13 @@ def projection_results(one_plane_point):
     if(len(right_points)> 5):
         right_popt = interpolate_points(right_points)
     else:
-        print("Plane does not have enough points for interpolation")
+        #print("Plane does not have enough points for interpolation")
         right_popt = -1
 
     if(len(left_points)> 5):
         left_popt = interpolate_points(left_points)
     else:
-        print("Plane does not have enough points for interpolation")
+        #print("Plane does not have enough points for interpolation")
         left_popt = -1
     
     return right_popt, right_points, left_popt, left_points #, right_func_deg, left_func_deg
@@ -305,7 +305,7 @@ def generate_points(right_popt, right_points, left_popt, left_points):  #generat
     x = np.linspace(lowest[0], highest[0], 100)
 
     if(type(right_popt) == int or type(left_popt) == int):
-        print("Plane does not have enough points for interpolation")
+        #print("Plane does not have enough points for interpolation")
         return -1, -1, -1
     else:
         y_right = func_4(x, *right_popt)
@@ -321,3 +321,27 @@ def generate_points(right_popt, right_points, left_popt, left_points):  #generat
         y_left[-1] = y_end
 
     return x, y_right, y_left
+
+def get_generated_points(right_param, left_param, right_pts, left_pts):
+    x_list = []
+    y_right_list = []
+    y_left_list = []
+    removed = []
+    for i in range(len(all_plane_points)):
+        x, y_right, y_left = generate_points(right_param[i], right_pts[i], left_param[i], left_pts[i])
+        if(type(x) == int):
+            print("Plane {} has been removed".format(i))
+            removed.append(i)
+        else:
+            x_list.append(x)
+            y_right_list.append(y_right)
+            y_left_list.append(y_left)    
+            
+    right = [] 
+    left = []
+    for i in range(len(all_plane_points)):
+        if i not in removed:
+            right.append(right_pts[i])
+            left.append(left_pts[i])
+            
+    return x_list, y_right_list, y_left_list, right, left

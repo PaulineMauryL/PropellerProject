@@ -65,11 +65,23 @@ def plot_interpolation_param(right_points, left_points, x, y_right, y_left, i, t
     bt = str(round(blade_twist[i], 2))
 
     plt.text(0, -4, "Chord length " + cl + "mm", {'color': 'r', 'fontsize': 10})
-    plt.text(0, -5, "Blade twist " + bt + "mm", {'color': 'k', 'fontsize': 10})
+    plt.text(0, -5, "Blade twist " + bt + "deg", {'color': 'k', 'fontsize': 10})
 
     plt.legend()
     plt.title(title)
     plt.axis([-25, 15, -6, 6])
     plt.show()
     fig.savefig('Image/' + title + '.png')
+
+
+
+def plot_blade_twist(blade_twist):
+    fig = plt.figure()
+    plt.plot(blade_twist)  #[4:len(all_plane_points) -3]
+    plt.ylabel('Angle (in degrees)')
+    plt.xlabel('From hub to tip')
+    plt.title("Blade twist")
+    fig.savefig('Blade_twist.png')
+    plt.show()
+
 
