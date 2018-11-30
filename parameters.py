@@ -8,38 +8,42 @@ from plot_param import *
 
 
 ######################## For blade twist and chord length ############################
-def get_interpolated_points(right, popt):
-    _, _, _, highest_point, lowest_point = extreme_points(right)
+'''
+def get_interpolated_points(x_list, y_right_list, y_left_list): # mettre ici les truxs de chord length parce que pareil dans blade twist
     
-    highest_point[1] = func_4_scalar(highest_point[0], *popt)   #compute y value with interpolated function
-    highest_point[2] = 0                                 #do not take z into account
-    
-    lowest_point[1] = func_4_scalar(lowest_point[0], *popt)   #compute y value with interpolated function
-    lowest_point[2] = 0                                 #do not take z into account  
+    for x, y_right, y_left in zip(x_list, y_right_list, y_left_list):
+	    lowest_point = np.zeros([2, 1])
+	    lowest_point[0] = x[0]
+	    lowest_point[1] = (y_right[0] + y_left[0])/2
+
+	    highest_point = np.zeros([2, 1])
+	    highest_point[0] = x[-1]
+	    highest_point[1] = (y_right[-1], y_left[-1])/2
 
     return highest_point, lowest_point
+'''
 
-def get_chord_length(x, y_right, y_left):
-    chord_length = []
-
-    lowest_point = np.zeros([2, 1])
-    lowest_point[0] = x[0]
-    lowest_point[1] = np.mean(y_right[0], y_left[0])
-
-    highest_point = np.zeros([2, 1])
-    highest_point[0] = x[-1]
-    highest_point[1] = np.mean(y_right[-1], y_left[-1])
-    
-    length = distance_p2p(highest_point, lowest_point)
-        
-
-    chord_length.append( length ) 
-
-    return chord_length
 
 ######################################################################################
 #################################    CHORD LENGTH   ##################################
 ######################################################################################
+def get_chord_length(x_list, y_right_list, y_left_list):
+    chord_length = []
+
+    for x, y_right, y_left in zip(x_list, y_right_list, y_left_list):
+	    lowest_point = np.zeros([2, 1])
+	    lowest_point[0] = x[0]
+	    lowest_point[1] = (y_right[0] + y_left[0])/2
+
+	    highest_point = np.zeros([2, 1])
+	    highest_point[0] = x[-1]
+	    highest_point[1] = (y_right[-1] + y_left[-1])/2
+	    
+	    chord_length.append( distance_p2p(highest_point, lowest_point) ) 
+
+    return chord_length
+
+'''
 def get_chord_length(right_param, left_param, right_pts, left_pts):
     chord_length = []
 
@@ -59,11 +63,35 @@ def get_chord_length(right_param, left_param, right_pts, left_pts):
             chord_length.append( max(distance_r, distance_l) ) 
 
     return chord_length
-
+'''
 
 ######################################################################################
 ################################      BLADE TWIST   ##################################
 ######################################################################################
+
+def get_blade_twist(x_list, y_right_list, y_left_list):
+	blade_twist = []
+
+	for x, y_right, y_left in zip(x_list, y_right_list, y_left_list):
+		lowest_point = np.zeros([2, 1])
+		lowest_point[0] = x[0]
+		lowest_point[1] = (y_right[0] + y_left[0])/2
+
+		highest_point = np.zeros([2, 1])
+		highest_point[0] = x[-1]
+		highest_point[1] = (y_right[-1] + y_left[-1])/2
+
+		direction = np.zeros([2, 1])
+		direction[0] = highest_point[0] - lowest_point[0]  #x[-1] - x[0]
+		direction[1] = highest_point[1] - lowest_point[1]  #y_right[-1] - y_right[0]
+
+		angle =  math.acos( direction[0] / math.sqrt(direction[0]**2 + direction[1]**2) ) * 180 / math.pi
+		blade_twist.append(angle)
+
+	return blade_twist
+
+'''
+
 def get_blade_twist(right_param, left_param, right_pts, left_pts):
     blade_twist = []
 
@@ -89,7 +117,7 @@ def get_blade_twist(right_param, left_param, right_pts, left_pts):
 
     return blade_twist
 
-
+'''
 ######################################################################################
 #################################     TIP RADIUS    ##################################
 ######################################################################################

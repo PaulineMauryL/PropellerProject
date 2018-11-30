@@ -31,39 +31,45 @@ def plot_hub(propeller_coords, hub_points, point_outer_radius, point_inner_radiu
     plt.show()
 
 
-def plot_interpolation_param(right_popt, right_points, left_popt, left_points, x, y_right, y_left, i, title):      
+def plot_interpolation_param(right_points, left_points, x, y_right, y_left, i, title, chord_length, blade_twist):      
 
-    if(type(right_popt) == int or type(left_popt) == int):
-        print("Plane {} does not have enough points for interpolation".format(i))
+    fig = plt.figure()
+    fig.add_subplot(111)
 
-    else:
-        fig = plt.figure()
-        fig.add_subplot(111)
-        
-        maxx = max(x)
-        minx = min(x)
-        y_right_max = func_4_scalar(maxx, *right_popt)
-        y_right_min = func_4_scalar(minx, *right_popt)
 
-        plt.plot([minx, maxx], [y_right_min, y_right_max]);
+    #Plot chord length
+    plt.plot([x[0], x[-1]], [y_right[0], y_right[-1]], "r-", label="Chord length", linewidth = 4);
 
-        _, _, _, highest, lowest = extreme_points(right_points)
-        x = np.linspace(lowest[0], highest[0], 100)
+    #Plot blade twist
+    '''
+    direction = np.zeros([2, 1])
+    direction[0] = x[-1] - x[0]  #x[-1] - x[0]
+    direction[1] = y_right[-1] - y_right[0]
+    angle =  math.acos( direction[0] / math.sqrt(direction[0]**2 + direction[1]**2) ) * 180 / math.pi
+    '''
 
-        #data_right = right_points.values[:,0]
-        y_right = func_4_scalar(x, *right_popt)
-        plt.scatter(x, y_right)
-        plt.scatter(right_points["X"], right_points["Y"])
-        
-        #data_left = left_points.values[:,0]
-        y_left = func_4_scalar(x, *left_popt)
-        plt.scatter(x, y_left)
-        plt.scatter(left_points["X"], left_points["Y"])
+    #Plot interpolated points
+    _, _, _, highest, lowest = extreme_points(right_points)
+    x = np.linspace(lowest[0], highest[0], 100)
+    plt.scatter(x, y_right, color='b', label="Interpolated points (up)")
+    plt.scatter(x, y_left, color ='c', label="Interpolated points (down)")
 
-        plt.xlabel('x_values', fontsize=15)
-        plt.ylabel('y_values', fontsize=15)
+    #Plot real points
+    plt.scatter(right_points["X"], right_points["Y"], color='g', marker='^', label="Real points (up)")
+    plt.scatter(left_points["X"],  left_points["Y"],  color='m', marker='^', label="Real points (down)")
 
-        plt.title(title)
-        plt.axis([-25, 15, -6, 6])
-        plt.show()
-        fig.savefig('Image/' + title + '.png')
+    plt.xlabel('x_values', fontsize=15)
+    plt.ylabel('y_values', fontsize=15)
+
+    cl = str(round(chord_length[i], 2))
+    bt = str(round(blade_twist[i], 2))
+
+    plt.text(0, -4, "Chord length " + cl + "mm", {'color': 'r', 'fontsize': 10})
+    plt.text(0, -5, "Blade twist " + bt + "mm", {'color': 'k', 'fontsize': 10})
+
+    plt.legend()
+    plt.title(title)
+    plt.axis([-25, 15, -6, 6])
+    plt.show()
+    fig.savefig('Image/' + title + '.png')
+

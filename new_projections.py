@@ -64,8 +64,8 @@ def points_of_plane(propeller_coords, plane, nb_projections, plane_nb):
 
     taken = propeller_coords.loc[index_segment].copy()
 
-    print("init")
-    print(count)
+    #print("init")
+    #print(count)
 
     #print(delta)
 
@@ -100,11 +100,11 @@ def points_of_plane(propeller_coords, plane, nb_projections, plane_nb):
         below_plane = below_plane[:] - [0,0,0,delta]                            #consider next interval at next iteration  
 
         #threshold -= 1
-    print("count")
-    print(count)
+    #print("count")
+    #print(count)
 
-    print("points_taken")
-    print(points_taken)
+    #print("points_taken")
+    #print(points_taken)
     #print(threshold)  # --> around 19 to 21 taken instead of 30
     # Takes both sides points
     plane_points = propeller_coords.loc[index_segment].copy()
@@ -253,11 +253,13 @@ def projection_results(one_plane_point):
     if(len(right_points)> 5):
         right_popt = interpolate_points(right_points)
     else:
+        print("Plane does not have enough points for interpolation")
         right_popt = -1
 
     if(len(left_points)> 5):
         left_popt = interpolate_points(left_points)
     else:
+        print("Plane does not have enough points for interpolation")
         left_popt = -1
     
     return right_popt, right_points, left_popt, left_points #, right_func_deg, left_func_deg
@@ -302,16 +304,20 @@ def generate_points(right_popt, right_points, left_popt, left_points):  #generat
     _, _, _, highest, lowest = extreme_points(right_points)
     x = np.linspace(lowest[0], highest[0], 100)
 
-    y_right = func_4(x, *right_popt)
-    y_left = func_4(x, *left_popt)
+    if(type(right_popt) == int or type(left_popt) == int):
+        print("Plane does not have enough points for interpolation")
+        return -1, -1, -1
+    else:
+        y_right = func_4(x, *right_popt)
+        y_left = func_4(x, *left_popt)
 
-    y_first = (y_right[0] + y_left[0])/2                   #for continuity
-    y_end  = (y_right[-1] + y_left[-1])/2
+        y_first = (y_right[0] + y_left[0])/2                   #for continuity
+        y_end  = (y_right[-1] + y_left[-1])/2
 
-    y_right[0] = y_first
-    y_left[0] = y_first
+        y_right[0] = y_first
+        y_left[0] = y_first
 
-    y_right[-1] = y_end
-    y_left[-1] = y_end
+        y_right[-1] = y_end
+        y_left[-1] = y_end
 
     return x, y_right, y_left
