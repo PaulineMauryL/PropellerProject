@@ -7,23 +7,6 @@ from plot_param import *
 
 
 
-######################## For blade twist and chord length ############################
-'''
-def get_interpolated_points(x_list, y_right_list, y_left_list): # mettre ici les truxs de chord length parce que pareil dans blade twist
-    
-    for x, y_right, y_left in zip(x_list, y_right_list, y_left_list):
-	    lowest_point = np.zeros([2, 1])
-	    lowest_point[0] = x[0]
-	    lowest_point[1] = (y_right[0] + y_left[0])/2
-
-	    highest_point = np.zeros([2, 1])
-	    highest_point[0] = x[-1]
-	    highest_point[1] = (y_right[-1], y_left[-1])/2
-
-    return highest_point, lowest_point
-'''
-
-
 ######################################################################################
 #################################    CHORD LENGTH   ##################################
 ######################################################################################
@@ -43,27 +26,6 @@ def get_chord_length(x_list, y_right_list, y_left_list):
 
     return chord_length
 
-'''
-def get_chord_length(right_param, left_param, right_pts, left_pts):
-    chord_length = []
-
-    for right, popt_right, left, popt_left in zip(right_pts, right_param, left_pts, left_param):
-        
-        if(type(popt_right) == int or type(popt_left) == int):
-            #chord_length.append('NaN')
-            pass
-
-        else:
-            highest_point_r, lowest_point_r = get_interpolated_points(right, popt_right)
-            distance_r = distance_p2p(highest_point_r, lowest_point_r)
-            
-            highest_point_l, lowest_point_l = get_interpolated_points(left, popt_left)
-            distance_l = distance_p2p(highest_point_l, lowest_point_l)
-
-            chord_length.append( max(distance_r, distance_l) ) 
-
-    return chord_length
-'''
 
 ######################################################################################
 ################################      BLADE TWIST   ##################################
@@ -90,34 +52,7 @@ def get_blade_twist(x_list, y_right_list, y_left_list):
 
 	return blade_twist
 
-'''
 
-def get_blade_twist(right_param, left_param, right_pts, left_pts):
-    blade_twist = []
-
-    for right, popt_right, left, popt_left in zip(right_pts, right_param, left_pts, left_param):
-        if(type(popt_right) == int or type(popt_left) == int):
-            #blade_twist.append('NaN')
-            pass
-
-        else:
-            highest_point_r, lowest_point_r = get_interpolated_points(right, popt_right)
-            direction_r = highest_point_r - lowest_point_r
-
-            highest_point_l, lowest_point_l = get_interpolated_points(left, popt_left)
-            direction_l = highest_point_l - lowest_point_l
-
-            direction = direction_l
-            direction[0] = (direction_r[0] + direction_l[0]) / 2
-            direction[1] = (direction_r[1] + direction_l[1]) / 2
-
-            angle =  math.acos( direction[0] / math.sqrt(direction[0]**2 + direction[1]**2) ) * 180 / math.pi
-            #print(angle)
-            blade_twist.append(angle)
-
-    return blade_twist
-
-'''
 ######################################################################################
 #################################     TIP RADIUS    ##################################
 ######################################################################################
@@ -152,27 +87,6 @@ def get_hub_points(propeller_coords, dmiddle, vect_length):
     
     return hub
 
-'''
-def find_hub_radius(middle_point, hub_inner_radius, vect_side, hub_points):
-	threshold = 0.042
-	alpha = threshold/2
-	m = 0
-	point_outer_radius = middle_point + [(hub_inner_radius + 1) * i for i in vect_side]
-	c = 0
-
-	while(m < threshold):
-	    point_outer_radius = point_outer_radius + [alpha*i for i in vect_side]
-	    c += 1
-	    #print(c)
-	    d = []
-	    for i, p in hub_points.iterrows():
-	        d.append( distance_p2p(point_outer_radius, p) )
-	    m = min(d)
-
-	point_inner_radius = middle_point + [hub_inner_radius * i for i in vect_side]
-
-	return point_outer_radius, point_inner_radius
-'''
 
 
 def get_hub_inner_radius(propeller_coords, vect_length):

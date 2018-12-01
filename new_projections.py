@@ -21,12 +21,7 @@ def points_of_plane(propeller_coords, plane, nb_projections, plane_nb):
     count=0
     max_aerofoil_width = aerofoil_width(propeller_coords)
 
-    if(plane_nb < nb_projections/10):
-        threshold = 5
-    elif(plane_nb > nb_projections-2):
-        threshold = 20
-    else:
-        threshold = 30
+    threshold = 30
 
     old_plane_above = plane[:]
     old_plane_below = plane[:]
@@ -322,13 +317,20 @@ def generate_points(right_popt, right_points, left_popt, left_points):  #generat
 
     return x, y_right, y_left
 
-def get_generated_points(right_param, left_param, right_pts, left_pts):
+def get_generated_points(right_param, left_param, right_pts, left_pts, delta_d):
     x_list = []
     y_right_list = []
     y_left_list = []
     removed = []
-    for i in range(len(all_plane_points)):
+    position = []
+
+    delta_d = abs(delta_d)
+    delta_tot = 0
+
+    for i in range(len(right_param)):
         x, y_right, y_left = generate_points(right_param[i], right_pts[i], left_param[i], left_pts[i])
+        delta_tot += delta_d
+
         if(type(x) == int):
             print("Plane {} has been removed".format(i))
             removed.append(i)
@@ -336,12 +338,13 @@ def get_generated_points(right_param, left_param, right_pts, left_pts):
             x_list.append(x)
             y_right_list.append(y_right)
             y_left_list.append(y_left)    
+            position.append(delta_tot)
             
     right = [] 
     left = []
-    for i in range(len(all_plane_points)):
+    for i in range(len(right_param)):
         if i not in removed:
             right.append(right_pts[i])
             left.append(left_pts[i])
             
-    return x_list, y_right_list, y_left_list, right, left
+    return x_list, y_right_list, y_left_list, right, left, position, len(removed)

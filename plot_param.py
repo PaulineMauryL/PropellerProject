@@ -58,8 +58,8 @@ def plot_interpolation_param(right_points, left_points, x, y_right, y_left, i, t
     plt.scatter(right_points["X"], right_points["Y"], color='g', marker='^', label="Real points (up)")
     plt.scatter(left_points["X"],  left_points["Y"],  color='m', marker='^', label="Real points (down)")
 
-    plt.xlabel('x_values', fontsize=15)
-    plt.ylabel('y_values', fontsize=15)
+    plt.xlabel('x', fontsize=15)
+    plt.ylabel('y', fontsize=15)
 
     cl = str(round(chord_length[i], 2))
     bt = str(round(blade_twist[i], 2))
@@ -71,17 +71,34 @@ def plot_interpolation_param(right_points, left_points, x, y_right, y_left, i, t
     plt.title(title)
     plt.axis([-25, 15, -6, 6])
     plt.show()
-    fig.savefig('Image/' + title + '.png')
+    fig.savefig('Report/plots/' + title + '.png')
 
 
 
-def plot_blade_twist(blade_twist):
+def plot_blade_twist(blade_twist, position):
     fig = plt.figure()
-    plt.plot(blade_twist)  #[4:len(all_plane_points) -3]
-    plt.ylabel('Angle (in degrees)')
-    plt.xlabel('From hub to tip')
-    plt.title("Blade twist")
-    fig.savefig('Blade_twist.png')
+    plt.plot(position, blade_twist, color="blue", linewidth=2.5)  
+    plt.ylabel('Angle (in degrees)', fontsize=15)
+    plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
+    plt.title("Blade twist", fontsize=20)
+    fig.savefig('Report/plots/Blade_twist.png')
     plt.show()
 
 
+def plot_chord_length(chord_length, position):
+    fig = plt.figure()
+    plt.plot(position, chord_length, color="red", linewidth=2.5)  
+    plt.ylabel('Chord length (mm)', fontsize=15)
+    plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
+    plt.title("Chord length", fontsize=20)
+    fig.savefig('Report/plots/chord length.png')
+    plt.show()
+
+def plot_chord_blade(chord_length, blade_twist, position):
+    fig = plt.figure()
+    plt.plot(position, chord_length, color="red", linewidth=2.5)
+    plt.plot(position, blade_twist, color="blue", linewidth=2.5)    
+    plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
+    plt.title("Chord length and blade twist", fontsize=20)
+    fig.savefig('Report/plots/chord_blade.png')
+    plt.show()
