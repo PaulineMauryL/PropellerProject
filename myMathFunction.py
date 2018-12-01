@@ -37,9 +37,11 @@ def distance_point_plane(point, plane):
 
 
 
-def distance_p2p(x1, x2):
+def distance_p2p_3d(x1, x2):
     return math.sqrt( (x2[0] - x1[0])**2 + (x2[1] - x1[1])**2 + (x2[2] - x1[2])**2 )
 
+def distance_p2p(x1, x2):
+    return math.sqrt( (x2[0] - x1[0])**2 + (x2[1] - x1[1])**2 )
 
 
 def project_point(point, plane):

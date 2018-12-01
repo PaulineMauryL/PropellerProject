@@ -31,7 +31,7 @@ def get_planes(blade, dmiddle, d_highest, vect, nb_seg):
 
 	planes[-1] = planes[-1] + [0,0,0,0.1]
 
-	return planes
+	return planes, delta_d
 
 
 
