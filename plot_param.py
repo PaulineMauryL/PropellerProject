@@ -11,23 +11,24 @@ import pandas as pd
 def plot_hub(propeller_coords, hub_points, point_outer_radius, point_inner_radius):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection = '3d')
-    ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'ro', markersize=0.3, alpha=0.2)
-    ax.plot(hub_points["X"], hub_points["Y"], hub_points["Z"], 'co', markersize=0.3, alpha=0.2)
+    ax.scatter(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], s=1, c='k', label = "Point cloud")
     
+    ax.scatter(hub_points["X"], hub_points["Y"], hub_points["Z"], s=20, c='g', label = "Selected points")
 
-    ax.scatter(point_outer_radius[0], point_outer_radius[1], point_outer_radius[2], s=25, c='k')
-    ax.scatter(point_inner_radius[0], point_inner_radius[1], point_inner_radius[2], s=25, c='k')
+    ax.scatter(point_outer_radius[0], point_outer_radius[1], point_outer_radius[2], s=50, c='r', label= "Outer radius")
+    ax.scatter(point_inner_radius[0], point_inner_radius[1], point_inner_radius[2], s=50, c='r', label= "Inner radius")
     downlim, uplim = findMinMaxDF(propeller_coords)
 
-    ax.set_xlabel('x_values', fontsize=15)
-    ax.set_ylabel('y_values', fontsize=15)
-    ax.set_zlabel('z_values', fontsize=15)
+    ax.set_xlabel('X (mm)', fontsize=20)
+    ax.set_ylabel('Y (mm)', fontsize=20)
+    ax.set_zlabel('Z (mm)', fontsize=20)
     
     ax.set_xlim([downlim, uplim]);
     ax.set_ylim([downlim, uplim]);
     ax.set_zlim([downlim, uplim]);
     
-    plt.title('Hub radius', fontsize=20)
+    plt.legend(loc=0, prop={'size':20})
+    plt.title('Hub radius', fontsize=30)
     plt.show()
 
 
@@ -49,7 +50,7 @@ def plot_interpolation_param(right_points, left_points, x, y_right, y_left, i, t
     '''
 
     #Plot interpolated points
-    _, _, _, highest, lowest = extreme_points(right_points)
+    _, highest, lowest = extreme_points(right_points)
     x = np.linspace(lowest[0], highest[0], 100)
     plt.scatter(x, y_right, color='b', label="Interpolated points (up)")
     plt.scatter(x, y_left, color ='c', label="Interpolated points (down)")

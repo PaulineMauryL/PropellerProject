@@ -59,7 +59,7 @@ def get_blade_twist(x_list, y_right_list, y_left_list):
 
 def get_tip_radius(propeller_coords):  # say in report that mean with lowest
     
-    _, _, middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
+    middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
     tip_radius = ( np.linalg.norm(highest_point - middle_point) + np.linalg.norm(lowest_point - middle_point) )/2
     
     return tip_radius
@@ -70,7 +70,7 @@ def get_tip_radius(propeller_coords):  # say in report that mean with lowest
 ######################################################################################
 
 def get_hub_points(propeller_coords, dmiddle, vect_length):
-    size = 0.5
+    size = 4
     plane = np.append(vect_length, dmiddle)
     upper_plane = plane[:] + [0,0,0,size]
     lower_plane = plane[:] - [0,0,0,size]
@@ -90,7 +90,7 @@ def get_hub_points(propeller_coords, dmiddle, vect_length):
 
 
 def get_hub_inner_radius(propeller_coords, vect_length):
-	a, b, middle_point, c, d= extreme_points(propeller_coords)
+	middle_point, _, _= extreme_points(propeller_coords)
 
 	dist = (propeller_coords.add(-middle_point)).copy()
 
@@ -136,7 +136,7 @@ def get_hub_radius(hub, middle_point, hub_inner_radius, vect_side):
 
 def param_hub_radius(propeller_coords, vect_length):
     
-    _, _, middle_point, _, _ = extreme_points(propeller_coords)
+    middle_point, _, _ = extreme_points(propeller_coords)
 
     dmiddle     = - middle_point @ vect_length
     hub_points  = get_hub_points(propeller_coords, dmiddle, vect_length)

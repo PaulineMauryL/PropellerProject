@@ -172,3 +172,26 @@ def add_border_points(right_points, one_plane_point):
     right_points = right_points.append(pd.DataFrame(side2_border.reshape(1, 3), columns = ["X","Y","Z"]))
 
     return right_points.sort_values('X').reset_index(drop=True)
+
+def get_segments(blade, planes, nb_seg):
+
+    segments = {}
+    segments["points"] = []
+
+    for i in range(nb_seg):
+        index_segment = []
+
+        for index, point in blade.iterrows():
+            point_mult = np.append(point, 1)
+            if(point_mult @ planes[i] > 0 and point_mult @ planes[i+1] <= 0):
+                index_segment.append(index)
+
+        segments["points"].append(blade.loc[index_segment].copy().as_matrix())
+
+    for index, point in blade.iterrows():
+        point_mult = np.append(point, 1)
+        if(point_mult @ planes[nb_seg] > 0):
+            index_segment.append(index) 
+    segments["points"].append(blade.loc[index_segment].copy().as_matrix())
+
+    return segments
