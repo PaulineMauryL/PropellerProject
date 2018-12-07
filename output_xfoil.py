@@ -22,15 +22,13 @@ def get_planes_xfoil(blade, d_middle, d_lowest, vect_length, positions):
 
 
 
-def generate_points_xfoil(right_popt, right_points, left_popt, left_points):  #generate for X-foil
+def generate_points_xfoil(x, right_popt, right_points, left_popt, left_points):  #generate for X-foil
     _, highest, lowest = extreme_points(right_points)
     #x = np.linspace(lowest[0], highest[0], 100)
     scale = highest[0] - lowest[0]
 
     #print(right_popt)
     #print(left_popt)
-
-    x = [1, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.0750, 0.05, 0.025, 0.0125, 0]
 
     x = [a * scale + lowest[0] for a in x ] 
     x = np.array( [x] )
@@ -64,14 +62,14 @@ def generate_points_xfoil(right_popt, right_points, left_popt, left_points):  #g
 
 
 
-def get_generated_points_xfoil(right_param, left_param, right_pts, left_pts):
+def get_generated_points_xfoil(x, right_param, left_param, right_pts, left_pts):
     x_list = []
     y_right_list = []
     y_left_list = []
     removed = []
 
     for i in range(len(right_param)):
-        x, y_right, y_left = generate_points_xfoil(right_param[i], right_pts[i], left_param[i], left_pts[i])
+        x, y_right, y_left = generate_points_xfoil(x, right_param[i], right_pts[i], left_param[i], left_pts[i])
 
         if(type(x) == int):
             print("Plane {} has been removed".format(i))
