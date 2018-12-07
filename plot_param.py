@@ -103,3 +103,31 @@ def plot_chord_blade(chord_length, blade_twist, position):
     plt.title("Chord length and blade twist", fontsize=20)
     #fig.savefig('Report/plots/chord_blade.png')
     plt.show()
+
+######################################################################################
+#############################     RESULT COMPARISON    ###############################
+######################################################################################
+
+def plot_blade_twist_comparison(blade_twist, positions):
+    fig = plt.figure()
+    theoretical = [21.11, 23.9, 24.65, 24.11, 22.78, 21.01, 19, 17.06, 15.33, 13.82, 12.51, 11.36, 10.27, 9.32, 8.36, 7.27, 6.15]    
+    plt.plot(positions, blade_twist, color="blue", linewidth=2.5, label = "Computed")  
+    plt.plot(positions, theoretical, color="green", linewidth=2.5, label = "Real")
+    plt.xlabel('r/R', fontsize=15)    
+    plt.ylabel('Beta (degrees)', fontsize=15)
+    plt.title("Blade twist", fontsize=20)
+    plt.legend()
+    fig.savefig('Report/plots/Blade_twist_comparison.png')
+    plt.show()
+
+def plot_chord_length_comparison(chord_length, positions):
+    fig = plt.figure()
+    theoretical = [0.109, 0.132, 0.156, 0.176, 0.193, 0.206, 0.216, 0.223, 0.226, 0.225, 0.219, 0.21, 0.197, 0.179, 0.157, 0.13, 0.087]    
+    plt.plot(positions, chord_length, color="blue", linewidth=2.5, label = "Computed")  
+    plt.plot(positions, theoretical, color="green", linewidth=2.5, label = "Real")
+    plt.xlabel('r/R', fontsize=15)    
+    plt.ylabel('c/R', fontsize=15)
+    plt.title("Chord length", fontsize=20)
+    plt.legend()
+    fig.savefig('Report/plots/Chord_length_comparison.png')
+    plt.show()

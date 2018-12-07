@@ -135,12 +135,24 @@ def get_hub_radius(hub, middle_point, hub_inner_radius, vect_side):
 
 
 def param_hub_radius(propeller_coords):
+
 	middle_point, _, _ = extreme_points(propeller_coords)
 	vect_length, _, vect_side = get_principal_direction(propeller_coords)   #main directions
 	dmiddle     = - middle_point @ vect_length
+
 	hub_points  = get_hub_points(propeller_coords, dmiddle, vect_length)
+	
 	hub_inner_radius = get_hub_inner_radius(propeller_coords, vect_length)
 	outer_point, inner_point = get_hub_radius(hub_points, middle_point, hub_inner_radius, vect_side)
 	hub_radius_width = distance_p2p(outer_point, inner_point)
 	hub_radius = distance_p2p(middle_point, outer_point)
 	return hub_radius
+
+######################################################################################
+#############################     RESULT COMPARISON    ###############################
+######################################################################################
+
+#def plot_blade_twist_comparison(blade_twist, positions):
+
+
+
