@@ -13,18 +13,22 @@ def prepare_propeller(propeller):
     propeller = align_prop_length(propeller)      # longest axis aligned along z-axis
     propeller = center_prop(propeller)     # re-center prop: slight shift in previous function
 
-    vect_out, vect_side, vect_length = principal_direction()
-    #vect_length         = vect_blade(propeller)
-    #vect_out, vect_side = get_major_axis(propeller, vect_length)     #main directions   #former hub_inner_radius (put in function later)
+    vect_length, vect_out, vect_side = get_principal_direction(propeller)     #principal directions  
     propeller           = align_prop_side(propeller, vect_side) 
-
+    
+    vect_out, vect_side, vect_length = principal_direction()
+    
     return propeller, vect_length, vect_out, vect_side
+
+
 
 def principal_direction():
     vect_length = [0,0,1]
     vect_side   = [0,1,0]
     vect_out    = [1,0,0]
     return vect_out, vect_side, vect_length
+
+
 
 def center_prop(propeller_coords):
 	'''Center the propeller in (0,0,0) coordinates
@@ -160,17 +164,6 @@ def extreme_points(propeller_coords):
 	return middle_point, highest_point, lowest_point
 
 
-def vect_blade(propeller_coords):
-
-    middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
-
-    vect_length = normalize_vec(highest_point - middle_point)
-    #print(vect_blade)
-    #vect_upper = normalize_vec(max_point - middle_point)
-    #vect_lower = normalize_vec(middle_point - min_point)
-
-    return vect_length
-
 
 def d_blade(vect_length, propeller_coords):
 
@@ -197,8 +190,11 @@ def aerofoil_width(propeller_coords):
 	return math.sqrt( (maxx - minx)**2 + (maxy - miny)**2  )
 
 
-def get_major_axis(propeller_coords, vect_blade):
-	middle_point, _, _ = extreme_points(propeller_coords)
+
+def get_principal_direction(propeller_coords):
+	middle_point, highest_point, lowest_point = extreme_points(propeller_coords)
+
+	vect_length = normalize_vec(highest_point - middle_point)
 	dist = (propeller_coords.add(-middle_point)).copy()
 
 	distance = np.zeros( (len(dist),1) ) 
@@ -228,9 +224,9 @@ def get_major_axis(propeller_coords, vect_blade):
 	#print(vect_out)
 
 	# Get last direction
-	vect_side = np.cross(vect_out, vect_blade)
+	vect_side = np.cross(vect_out, vect_length)
 	#print(vect_side)
 	vect_side = normalize_vec(vect_side)
 	#print(vect_side)
 
-	return vect_out, vect_side
+	return vect_length, vect_out, vect_side

@@ -212,8 +212,11 @@ def interpolate_points(up1):
 #################################################################################################################
 def add_border_points(right_points, left_points):     #report for contuity
     #add extreme points to have same extremity on both sides
+    print(len(right_points))
+    print(len(left_points))
+    
     _, high_right, low_right = extreme_points(right_points)
-    _, high_left, low_left = extreme_points(left_points)
+    _, high_left,  low_left  = extreme_points(left_points)
     #minx_r = np.min(right_points[0])
     #maxx_r = np.max(right_points[0])
     #minx_l = np.min(left_points[0])

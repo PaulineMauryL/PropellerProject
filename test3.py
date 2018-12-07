@@ -27,7 +27,7 @@ hub_points = get_hub_points(propeller_coords, dmiddle, vect_length)
 
 point_outer_radius, point_inner_radius = get_hub_radius(hub_points, middle_point, hub_inner_radius, vect_side)
 
-plot_hub(propeller_coords, hub_points, point_outer_radius, point_inner_radius)
+#plot_hub(propeller_coords, hub_points, point_outer_radius, point_inner_radius)
 
 
 '''

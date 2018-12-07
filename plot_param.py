@@ -72,7 +72,7 @@ def plot_interpolation_param(right_points, left_points, x, y_right, y_left, i, t
     plt.title(title)
     plt.axis([-25, 15, -6, 6])
     plt.show()
-    fig.savefig('Report/plots/' + title + '.png')
+    #fig.savefig('Report/plots/' + title + '.png')
 
 
 
@@ -82,7 +82,7 @@ def plot_blade_twist(blade_twist, position):
     plt.ylabel('Angle (in degrees)', fontsize=15)
     plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
     plt.title("Blade twist", fontsize=20)
-    fig.savefig('Report/plots/Blade_twist.png')
+    #fig.savefig('Report/plots/Blade_twist.png')
     plt.show()
 
 
@@ -92,7 +92,7 @@ def plot_chord_length(chord_length, position):
     plt.ylabel('Chord length (mm)', fontsize=15)
     plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
     plt.title("Chord length", fontsize=20)
-    fig.savefig('Report/plots/chord length.png')
+    #fig.savefig('Report/plots/chord length.png')
     plt.show()
 
 def plot_chord_blade(chord_length, blade_twist, position):
@@ -101,5 +101,5 @@ def plot_chord_blade(chord_length, blade_twist, position):
     plt.plot(position, blade_twist, color="blue", linewidth=2.5)    
     plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
     plt.title("Chord length and blade twist", fontsize=20)
-    fig.savefig('Report/plots/chord_blade.png')
+    #fig.savefig('Report/plots/chord_blade.png')
     plt.show()

@@ -35,6 +35,7 @@ def get_planes(blade, dmiddle, d_highest, vect, nb_seg):
 
 
 
+
 def get_segments_points(blade, planes, nb_seg):
 	segments = {}
 	segments["points"] = []
