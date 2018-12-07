@@ -1,7 +1,10 @@
 import numpy as np
+import pandas as pd
+import math
 from prop_info import extreme_points
 from myMathFunction import func_4_scalar
 import matplotlib.pyplot as plt
+from new_projections import generate_points
 
 def get_planes_xfoil(blade, d_middle, d_lowest, vect_length, positions):
 	
@@ -21,7 +24,7 @@ def get_planes_xfoil(blade, d_middle, d_lowest, vect_length, positions):
 	return planes
 
 
-
+'''
 def generate_points_xfoil(x, right_popt, right_points, left_popt, left_points):  #generate for X-foil
     _, highest, lowest = extreme_points(right_points)
     #x = np.linspace(lowest[0], highest[0], 100)
@@ -52,24 +55,24 @@ def generate_points_xfoil(x, right_popt, right_points, left_popt, left_points): 
 
     #print(y_right - y_left)
 
-    x       = (x - lowest[0])/scale 
+    #x       = (x - lowest[0])/scale 
     y_right = y_right/scale
     y_left  = y_left/scale
 
     #print(y_right - y_left)
 
-    return x, y_right, y_left
+    return y_right, y_left
+'''
 
 
-
-def get_generated_points_xfoil(x, right_param, left_param, right_pts, left_pts):
+def get_generated_points_xfoil(right_param, left_param, right_pts, left_pts):
     x_list = []
     y_right_list = []
     y_left_list = []
     removed = []
 
     for i in range(len(right_param)):
-        x, y_right, y_left = generate_points_xfoil(x, right_param[i], right_pts[i], left_param[i], left_pts[i])
+        x, y_right, y_left = generate_points(right_param[i], right_pts[i], left_param[i], left_pts[i])
 
         if(type(x) == int):
             print("Plane {} has been removed".format(i))
@@ -88,7 +91,7 @@ def get_generated_points_xfoil(x, right_param, left_param, right_pts, left_pts):
         else:
         	print("Warning a plane has been removed (did not have enough point during interpolation)")
             
-    return x_list, y_right_list, y_left_list, right, left, len(removed)
+    return x_list, y_right_list, y_left_list, len(removed)
 
 
 def plot_xfoil(x, y_right, y_left, position):      
@@ -103,25 +106,101 @@ def plot_xfoil(x, y_right, y_left, position):
     plt.ylabel('Y (mm)', fontsize=15)
 
     plt.title("X-foil input points at " + str(position) + "% from hub", fontsize = 30)
-    plt.axis([-0.5, 1.5, -0.5, 0.5])
+    plt.axis([-20, 20, -8, 8])
     plt.legend(loc=2, prop={'size':20})
     plt.show()
     #fig.savefig('Image/' + title + '.png')
 
 
-def xfoil_input_data(x, y_right, y_left, position):
+
+def xfoil_input_data(x_r, y_right, x_l, y_left, position):
     #fichier avec x et y dans l'ordre puis x et y_left reversed
-    length = len(x)
+    length = len(x_r)
     
     right = np.zeros([length, 2])    
-    right[:, 0] = x
+    right[:, 0] = x_r
     right[:, 1] = y_right
-    
+
+    #right[0,1] = 0
+    #right[length-1, 1] = 0
+
     left  = np.zeros([length, 2])
-    left[:, 0] = x[::-1]
+    left[:, 0] = x_l[::-1]
     left[:, 1] = y_left[::-1]
+
+    #left[0, 1] = 0
+    #left[length-1,1] = 0
     
-    output = np.vstack((right, left))
-    
-    filename = "xfoil" + str(position) + ".txt"
-    np.savetxt(filename, output)
+    xy = np.vstack((right, left))
+
+    filename = "XFOIL6.99/xfoil" + str(position) + ".txt"
+
+    np.savetxt(filename, xy)
+
+
+'''
+def xfoil_get_blade_twist(x, y_right_list, y_left_list):
+	blade_twist = []
+
+	for y_right, y_left in zip(y_right_list, y_left_list):
+		lowest_point = np.zeros([2, 1])
+		lowest_point[0] = x[0]
+		lowest_point[1] = (y_right[0, 0] + y_left[0, 0])/2
+
+		highest_point = np.zeros([2, 1])
+		highest_point[0] = x[-1]
+		highest_point[1] = (y_right[0,-1] + y_left[0,-1])/2
+
+		direction = np.zeros([2, 1])
+		direction[0] = highest_point[0] - lowest_point[0]  #x[-1] - x[0]
+		direction[1] = highest_point[1] - lowest_point[1]  #y_right[-1] - y_right[0]
+
+		angle =  math.acos( direction[0] / math.sqrt(direction[0]**2 + direction[1]**2) ) * 180 / math.pi
+		blade_twist.append(angle)
+
+	return blade_twist
+'''
+
+def align_aerofoil(x_list, y_right_list, y_left_list, blade_twist):
+	 #Align aerofoil such that blade twîst = 0
+		#INPUT: dataframe of points aligned in z, vect on side of prop
+		#OUTPUT: dataframe of aligned points aligned everywhere
+	x_r_rotated = []
+	y_r_rotated = []
+	x_l_rotated = []
+	y_l_rotated = []
+
+	i = 0
+	blade_twist = [bt * math.pi / 180 for bt in blade_twist]
+	ct = np.cos(blade_twist)
+	st = np.sin(blade_twist)
+
+	for x, y_r, y_l in zip(x_list, y_right_list, y_left_list):
+
+		x_r_rotated.append(  x*ct[i] + y_r*st[i])
+		y_r_rotated.append( -x*st[i] + y_r*ct[i])
+
+		x_l_rotated.append(  x*ct[i] + y_l*st[i])
+		y_l_rotated.append( -x*st[i] + y_l*ct[i])
+
+		i = i+1
+
+	return x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated
+
+
+def plot_xfoil_aligned(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, position):      
+
+    fig = plt.figure()
+    fig.add_subplot(111)
+
+    plt.scatter(x_r_rotated, y_r_rotated, s=170, color='r', marker='.', label="Upper edge")
+    plt.scatter(x_l_rotated, y_l_rotated,  s=170, color='c', marker='.', label="Lower edge") 
+
+    plt.xlabel('X (mm)', fontsize=15)
+    plt.ylabel('Y (mm)', fontsize=15)
+
+    plt.title("X-foil input points at " + str(position) + "% from hub", fontsize = 30)
+    plt.axis([-20, 20, -8, 8])
+    plt.legend(loc=2, prop={'size':20})
+    plt.show()
+    #fig.savefig('Image/' + title + '.png')
