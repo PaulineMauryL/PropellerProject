@@ -152,7 +152,17 @@ def param_hub_radius(propeller_coords):
 #############################     RESULT COMPARISON    ###############################
 ######################################################################################
 
-#def plot_blade_twist_comparison(blade_twist, positions):
+def param_mean_error(real, theory):
+	error = 0
+	for r, t in zip(real, theory):
+		error = error + abs(r - t)
+	error = error/len(real)
+	return error
 
-
+def param_RMSE(real, theory):
+	error = 0
+	for r, t in zip(real, theory):
+		error = error + (r - t)*(r - t)
+	error = error/len(real)
+	return error
 
