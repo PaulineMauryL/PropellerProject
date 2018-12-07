@@ -107,3 +107,21 @@ def plot_xfoil(x, y_right, y_left, position):
     plt.legend(loc=2, prop={'size':20})
     plt.show()
     #fig.savefig('Image/' + title + '.png')
+
+
+def xfoil_input_data(x, y_right, y_left, position):
+    #fichier avec x et y dans l'ordre puis x et y_left reversed
+    length = len(x)
+    
+    right = np.zeros([length, 2])    
+    right[:, 0] = x
+    right[:, 1] = y_right
+    
+    left  = np.zeros([length, 2])
+    left[:, 0] = x[::-1]
+    left[:, 1] = y_left[::-1]
+    
+    output = np.vstack((right, left))
+    
+    filename = "xfoil" + str(position) + ".txt"
+    np.savetxt(filename, output)
