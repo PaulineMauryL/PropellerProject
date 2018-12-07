@@ -5,7 +5,7 @@ from prop_info import extreme_points, aerofoil_width
 import scipy.linalg
 from scipy.optimize import curve_fit
 from myMathFunction import *
-from plot_projections import plot_projection_up_down, D2_plot #plot_interpolation_side
+from plot_projections import plot_projection_up_down, D2_plot, plot_least_squares_latex, plot_interpolation_both_sides_no_generation #plot_interpolation_side
 
 
 
@@ -67,7 +67,7 @@ def points_of_plane(propeller_coords, plane, nb_projections, plane_nb):
     while(points_taken < threshold):   # while less than threshold nb of pts are added at each iteration, continue to add points
         #nb_pts_at_a_time = 0
         count += 1
-        if(count > 100):  #farther than 100*0,05 = 0,5mm then stop
+        if(count > 100):  #farther than 100*0,05 = 5mm then stop
             break
         for index, point in propeller_coords.iterrows(): 
             point_mult = np.append(point, 1)                                #[x, y, z] to [x, y, z, 1]: to multiply with plane [a, b, c, d]
@@ -173,6 +173,13 @@ def assign_points(C_up, up):
     right_points = (up.loc[right]).reset_index(drop=True)
     left_points  = (up.loc[left] ).reset_index(drop=True)
 
+    x_l = np.linspace(-20,10, 100)
+    y_l = []
+    for x in x_l:
+        y_l.append( ls_plane(C_up, x) )
+
+    #plot_least_squares_latex(right_points, left_points, x_l, y_l)
+
     return right_points, left_points
 
 #################################################################################################################
@@ -205,8 +212,11 @@ def interpolate_points(up1):
 #################################################################################################################
 def add_border_points(right_points, left_points):     #report for contuity
     #add extreme points to have same extremity on both sides
-    _, _, _, high_right, low_right = extreme_points(right_points)
-    _, _, _, high_left, low_left = extreme_points(left_points)
+    print(len(right_points))
+    print(len(left_points))
+    
+    _, high_right, low_right = extreme_points(right_points)
+    _, high_left,  low_left  = extreme_points(left_points)
     #minx_r = np.min(right_points[0])
     #maxx_r = np.max(right_points[0])
     #minx_l = np.min(left_points[0])
@@ -257,6 +267,8 @@ def projection_results(one_plane_point):
         #print("Plane does not have enough points for interpolation")
         left_popt = -1
     
+    #plot_interpolation_both_sides_no_generation(right_popt, right_points, left_popt, left_points)
+
     return right_popt, right_points, left_popt, left_points #, right_func_deg, left_func_deg
 
 
@@ -296,7 +308,7 @@ def get_all_projections(planes, all_planes_points):
 #################################################################################################################
 
 def generate_points(right_popt, right_points, left_popt, left_points):  #generate for X-foil
-    _, _, _, highest, lowest = extreme_points(right_points)
+    _, highest, lowest = extreme_points(right_points)
     x = np.linspace(lowest[0], highest[0], 100)
 
     if(type(right_popt) == int or type(left_popt) == int):

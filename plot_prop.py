@@ -25,8 +25,8 @@ class Arrow3D(FancyArrowPatch):
 def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	#print("plot with blade {}\n out {}\n side{}".format(vect_blade, vect_out, vect_side))
 	vect_blade = [x *100 for x in vect_blade]
-	vect_out = [x *100 for x in vect_out]
-	vect_side = [x *100 for x in vect_side]
+	vect_out   = [x *100 for x in vect_out]
+	vect_side  = [x *100 for x in vect_side]
 	
 	fig = plt.figure()
 
@@ -36,35 +36,43 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	#ax.scatter(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"])
 
 	# markersize et alpha contrôlent la taille des points, i.e. le rendering de l'objet
-	ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'k.', markersize=2, alpha=0.6)
+	pc, = ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'k.', markersize=5, alpha=0.6, label = "Point cloud")
 
 	downlim, uplim = findMinMaxDF(propeller_coords)
 
-	ax.plot([np.mean(propeller_coords["X"])], [np.mean(propeller_coords["Y"])], [np.mean(propeller_coords["Z"])],
-	        'o', markersize=10, color='red', alpha=0.5)
+	mp, = ax.plot([np.mean(propeller_coords["X"])], [np.mean(propeller_coords["Y"])], [np.mean(propeller_coords["Z"])],
+	        '*', markersize=15, color='red', alpha=1, label = "Middle point")
 
 	a = Arrow3D([np.mean(propeller_coords["X"]), np.mean(propeller_coords["X"]) + vect_blade[0]], 
             [np.mean(propeller_coords["Y"]), np.mean(propeller_coords["Y"]) + vect_blade[1]], 
             [np.mean(propeller_coords["Z"]), np.mean(propeller_coords["Z"]) + vect_blade[2]], 
-            mutation_scale=20, lw=3, arrowstyle="-|>", color="r")
+            mutation_scale=20, lw=5, arrowstyle="-|>", color="green", label = "Point cloud")
 	ax.add_artist(a)
 
 	b = Arrow3D([np.mean(propeller_coords["X"]), np.mean(propeller_coords["X"]) + vect_out[0]], 
             [np.mean(propeller_coords["Y"]), np.mean(propeller_coords["Y"]) + vect_out[1]], 
             [np.mean(propeller_coords["Z"]), np.mean(propeller_coords["Z"]) + vect_out[2]], 
-            mutation_scale=20, lw=3, arrowstyle="-|>", color="r")
+            mutation_scale=20, lw=5, arrowstyle="-|>", color="blue")
 	ax.add_artist(b)
 
 	c = Arrow3D([np.mean(propeller_coords["X"]), np.mean(propeller_coords["X"]) + vect_side[0]], 
             [np.mean(propeller_coords["Y"]), np.mean(propeller_coords["Y"]) + vect_side[1]], 
             [np.mean(propeller_coords["Z"]), np.mean(propeller_coords["Z"]) + vect_side[2]], 
-            mutation_scale=20, lw=3, arrowstyle="-|>", color="r")
+            mutation_scale=20, lw=5, arrowstyle="-|>", color="cyan")
 	ax.add_artist(c)		
 
+	# Define an arbitrary legend handle with a proxy:
+	#rec1 = plt.Rectangle((0, 0), 1, 1, fc='blue', lw=0, alpha=0.25)
+
+	# Generate the legend:
+	handles = [pc, mp, a, b, c]
+	labels = ["Point cloud", "Middle point", "n", "v", "w"]
+	ax.legend(handles, labels, loc=0, prop={'size': 20})
+
 	#plt.axes().set_aspect('equal')
-	ax.set_xlabel('X', fontsize=20)
-	ax.set_ylabel('Y', fontsize=20)
-	ax.set_zlabel('Z', fontsize=20)
+	ax.set_xlabel('X (mm)', fontsize=20)
+	ax.set_ylabel('Y (mm)', fontsize=20)
+	ax.set_zlabel('Z (mm)', fontsize=20)
 
 	#plt.axis([0, 100, 0, 50, 0, uplim])
 	
@@ -72,7 +80,8 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	ax.set_ylim([downlim, uplim]);
 	ax.set_zlim([downlim, uplim]);
 
-	plt.title('Principal directions of propeller', fontsize=20)
+	plt.tight_layout()
+	plt.title('Principal directions of propeller', fontsize=30)
 
 	plt.show()
 
@@ -83,23 +92,24 @@ def plot_pointcloud(propeller_coords):
 	fig = plt.figure()
 
 	ax = fig.add_subplot(111, projection = '3d')
-	ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'k.', markersize=2, alpha=0.6)
+	ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'k.', markersize=5, alpha=0.6)
 
 	downlim, uplim = findMinMaxDF(propeller_coords)
 
 	#ax.plot([np.mean(propeller_coords["X"])], [np.mean(propeller_coords["Y"])], [np.mean(propeller_coords["Z"])],
 	#        'o', markersize=10, color='red', alpha=0.5)
 
-	ax.set_xlabel('X', fontsize=20)
-	ax.set_ylabel('Y', fontsize=20)
-	ax.set_zlabel('Z', fontsize=20)
+	ax.set_xlabel('X (mm)', fontsize=20)
+	ax.set_ylabel('Y (mm)', fontsize=20)
+	ax.set_zlabel('Z (mm)', fontsize=20)
 
 
-	ax.set_xlim([downlim, uplim]);
-	ax.set_ylim([downlim, uplim]);
-	ax.set_zlim([downlim, uplim]);
+	ax.set_xlim([-75, 75]);
+	ax.set_ylim([-75, 75]);
+	ax.set_zlim([0, 130]);
 
-	plt.title('Point cloud propeller', fontsize=20)
+	plt.tight_layout()
+	plt.title('Upper blade point cloud', fontsize=30)
 
 	plt.show()
 
@@ -122,24 +132,24 @@ def plot_segments(segments):
 
 	ax = fig.add_subplot(111, projection = '3d')
 
-	ax.plot(seg_df_0["X"], seg_df_0["Y"], seg_df_0["Z"], 'k.', markersize=4, alpha=0.6, label = "Points of segment 0")
-	ax.plot(seg_df_1["X"], seg_df_1["Y"], seg_df_1["Z"], 'b.', markersize=4, alpha=0.6, label = "Points of segment 1")
-	ax.plot(seg_df_2["X"], seg_df_2["Y"], seg_df_2["Z"], 'g.', markersize=4, alpha=0.6, label = "Points of segment 2")
-	ax.plot(seg_df_3["X"], seg_df_3["Y"], seg_df_3["Z"], 'r.', markersize=4, alpha=0.6, label = "Points of segment 3")
-	ax.plot(seg_df_4["X"], seg_df_4["Y"], seg_df_4["Z"], 'm.', markersize=4, alpha=0.6, label = "Points of segment 4")
+	ax.plot(seg_df_0["X"], seg_df_0["Y"], seg_df_0["Z"], 'k.', markersize=8, alpha=1, label = "Points of segment 0")
+	ax.plot(seg_df_1["X"], seg_df_1["Y"], seg_df_1["Z"], 'b.', markersize=8, alpha=1, label = "Points of segment 1")
+	ax.plot(seg_df_2["X"], seg_df_2["Y"], seg_df_2["Z"], 'g.', markersize=8, alpha=1, label = "Points of segment 2")
+	ax.plot(seg_df_3["X"], seg_df_3["Y"], seg_df_3["Z"], 'r.', markersize=8, alpha=1, label = "Points of segment 3")
+	ax.plot(seg_df_4["X"], seg_df_4["Y"], seg_df_4["Z"], 'm.', markersize=8, alpha=1, label = "Points of segment 4")
 
 	downlim, uplim = findMinMaxDF(seg_df_0)
 
-	ax.set_xlabel('X', fontsize=20)
-	ax.set_ylabel('Y', fontsize=20)
-	ax.set_zlabel('Z', fontsize=20)
+	ax.set_xlabel('X (mm)', fontsize=20)
+	ax.set_ylabel('Y (mm)', fontsize=20)
+	ax.set_zlabel('Z (mm)', fontsize=20)
 
-	ax.set_xlim([downlim, uplim]);
-	ax.set_ylim([downlim, uplim]);
-	ax.set_zlim([downlim+50, uplim+50]);
+	ax.set_xlim([-75, 75]);
+	ax.set_ylim([-75, 75]);
+	ax.set_zlim([0, 130]);
 
-	plt.title('Segments of points between planes', fontsize=20)
-	plt.legend(loc=5)#, prop={'size':8})
+	plt.title('Segments of points between planes', fontsize=30)
+	plt.legend(loc=0, prop={'size':20})
 
 	plt.show()
 

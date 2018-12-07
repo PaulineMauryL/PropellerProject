@@ -11,23 +11,24 @@ import pandas as pd
 def plot_hub(propeller_coords, hub_points, point_outer_radius, point_inner_radius):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection = '3d')
-    ax.plot(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], 'ro', markersize=0.3, alpha=0.2)
-    ax.plot(hub_points["X"], hub_points["Y"], hub_points["Z"], 'co', markersize=0.3, alpha=0.2)
+    ax.scatter(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], s=1, c='k', label = "Point cloud")
     
+    ax.scatter(hub_points["X"], hub_points["Y"], hub_points["Z"], s=20, c='g', label = "Selected points")
 
-    ax.scatter(point_outer_radius[0], point_outer_radius[1], point_outer_radius[2], s=25, c='k')
-    ax.scatter(point_inner_radius[0], point_inner_radius[1], point_inner_radius[2], s=25, c='k')
+    ax.scatter(point_outer_radius[0], point_outer_radius[1], point_outer_radius[2], s=50, c='r', label= "Outer radius")
+    ax.scatter(point_inner_radius[0], point_inner_radius[1], point_inner_radius[2], s=50, c='r', label= "Inner radius")
     downlim, uplim = findMinMaxDF(propeller_coords)
 
-    ax.set_xlabel('x_values', fontsize=15)
-    ax.set_ylabel('y_values', fontsize=15)
-    ax.set_zlabel('z_values', fontsize=15)
+    ax.set_xlabel('X (mm)', fontsize=20)
+    ax.set_ylabel('Y (mm)', fontsize=20)
+    ax.set_zlabel('Z (mm)', fontsize=20)
     
     ax.set_xlim([downlim, uplim]);
     ax.set_ylim([downlim, uplim]);
     ax.set_zlim([downlim, uplim]);
     
-    plt.title('Hub radius', fontsize=20)
+    plt.legend(loc=0, prop={'size':20})
+    plt.title('Hub radius', fontsize=30)
     plt.show()
 
 
@@ -49,7 +50,7 @@ def plot_interpolation_param(right_points, left_points, x, y_right, y_left, i, t
     '''
 
     #Plot interpolated points
-    _, _, _, highest, lowest = extreme_points(right_points)
+    _, highest, lowest = extreme_points(right_points)
     x = np.linspace(lowest[0], highest[0], 100)
     plt.scatter(x, y_right, color='b', label="Interpolated points (up)")
     plt.scatter(x, y_left, color ='c', label="Interpolated points (down)")
@@ -71,7 +72,7 @@ def plot_interpolation_param(right_points, left_points, x, y_right, y_left, i, t
     plt.title(title)
     plt.axis([-25, 15, -6, 6])
     plt.show()
-    fig.savefig('Report/plots/' + title + '.png')
+    #fig.savefig('Report/plots/' + title + '.png')
 
 
 
@@ -81,7 +82,7 @@ def plot_blade_twist(blade_twist, position):
     plt.ylabel('Angle (in degrees)', fontsize=15)
     plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
     plt.title("Blade twist", fontsize=20)
-    fig.savefig('Report/plots/Blade_twist.png')
+    #fig.savefig('Report/plots/Blade_twist.png')
     plt.show()
 
 
@@ -91,7 +92,7 @@ def plot_chord_length(chord_length, position):
     plt.ylabel('Chord length (mm)', fontsize=15)
     plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
     plt.title("Chord length", fontsize=20)
-    fig.savefig('Report/plots/chord length.png')
+    #fig.savefig('Report/plots/chord length.png')
     plt.show()
 
 def plot_chord_blade(chord_length, blade_twist, position):
@@ -100,5 +101,5 @@ def plot_chord_blade(chord_length, blade_twist, position):
     plt.plot(position, blade_twist, color="blue", linewidth=2.5)    
     plt.xlabel('Position in mm (from hub to tip)', fontsize=15)
     plt.title("Chord length and blade twist", fontsize=20)
-    fig.savefig('Report/plots/chord_blade.png')
+    #fig.savefig('Report/plots/chord_blade.png')
     plt.show()
