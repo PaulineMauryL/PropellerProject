@@ -1,7 +1,7 @@
 import numpy as np
 from prop_info import extreme_points
 from myMathFunction import func_4_scalar
-
+import matplotlib.pyplot as plt
 
 def get_planes_xfoil(blade, d_middle, d_lowest, vect_length, positions):
 	
@@ -26,7 +26,12 @@ def generate_points_xfoil(right_popt, right_points, left_popt, left_points):  #g
     _, highest, lowest = extreme_points(right_points)
     #x = np.linspace(lowest[0], highest[0], 100)
     scale = highest[0] - lowest[0]
-    x = [1, 0.95, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.0750, 0.05, 0.025, 0.0125, 0]
+
+    #print(right_popt)
+    #print(left_popt)
+
+    x = [1, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.0750, 0.05, 0.025, 0.0125, 0]
+
     x = [a * scale + lowest[0] for a in x ] 
     x = np.array( [x] )
 
@@ -37,18 +42,23 @@ def generate_points_xfoil(right_popt, right_points, left_popt, left_points):  #g
     y_right = func_4_scalar(x, *right_popt)
     y_left  = func_4_scalar(x, *left_popt)
 
-    y_first = (y_right[0] + y_left[0])/2                   #for continuity
-    y_end   = (y_right[-1] + y_left[-1])/2
+    
+    y_first = (y_right[0, 0] + y_left[0, 0])/2            #for continuity
+    y_end   = (y_right[0,-1] + y_left[0,-1])/2
 
-    y_right[0] = y_first
-    y_left[0]  = y_first
+    y_right[0, 0] = y_first
+    y_left[0, 0]  = y_first
 
-    y_right[-1] = y_end
-    y_left[-1]  = y_end
+    y_right[0,-1] = y_end
+    y_left[0,-1]  = y_end
 
-    x       = x/scale - lowest[0]
+    #print(y_right - y_left)
+
+    x       = (x - lowest[0])/scale 
     y_right = y_right/scale
     y_left  = y_left/scale
+
+    #print(y_right - y_left)
 
     return x, y_right, y_left
 
@@ -81,3 +91,21 @@ def get_generated_points_xfoil(right_param, left_param, right_pts, left_pts):
         	print("Warning a plane has been removed (did not have enough point during interpolation)")
             
     return x_list, y_right_list, y_left_list, right, left, len(removed)
+
+
+def plot_xfoil(x, y_right, y_left, position):      
+
+    fig = plt.figure()
+    fig.add_subplot(111)
+
+    plt.scatter(x, y_right, s=170, color='r', marker='.', label="Upper edge")
+    plt.scatter(x, y_left,  s=170, color='c', marker='.', label="Lower edge") 
+
+    plt.xlabel('X (mm)', fontsize=15)
+    plt.ylabel('Y (mm)', fontsize=15)
+
+    plt.title("X-foil input points at " + str(position) + "% from hub", fontsize = 30)
+    plt.axis([-0.5, 1.5, -0.5, 0.5])
+    plt.legend(loc=2, prop={'size':20})
+    plt.show()
+    #fig.savefig('Image/' + title + '.png')
