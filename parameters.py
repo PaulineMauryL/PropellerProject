@@ -159,6 +159,8 @@ def param_mean_error(real, theory):
 	error = error/len(real)
 	return error
 
+
+
 def param_RMSE(real, theory):
 	error = 0
 	for r, t in zip(real, theory):

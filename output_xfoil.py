@@ -116,23 +116,24 @@ def plot_xfoil(x, y_right, y_left, position):
 def xfoil_input_data(x_r, y_right, x_l, y_left, position):
     #fichier avec x et y dans l'ordre puis x et y_left reversed
     length = len(x_r)
-    
-    right = np.zeros([length, 2])    
-    right[:, 0] = x_r
-    right[:, 1] = y_right
+    scale = max(x_r) - min(x_r)
 
+    right = np.zeros([length, 2])    
+    right[:, 0] = x_r - min(x_r)
+    right[:, 1] = y_right
+    right = right/scale
     #right[0,1] = 0
     #right[length-1, 1] = 0
 
     left  = np.zeros([length, 2])
-    left[:, 0] = x_l[::-1]
+    left[:, 0] = x_l[::-1] - min(x_l)
     left[:, 1] = y_left[::-1]
-
+    left = left/scale
     #left[0, 1] = 0
     #left[length-1,1] = 0
-    
-    xy = np.vstack((right, left))
 
+    xy = np.vstack((right, left))
+    print(xy)
     filename = "XFOIL6.99/xfoil" + str(position) + ".txt"
 
     np.savetxt(filename, xy)
@@ -203,4 +204,30 @@ def plot_xfoil_aligned(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, posit
     plt.axis([-20, 20, -8, 8])
     plt.legend(loc=2, prop={'size':20})
     plt.show()
-    #fig.savefig('Image/' + title + '.png')
+    fig.savefig('Image/' + str(position) + '_raw.png')
+
+
+def plot_xfoil_scaled(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, position):      
+
+    fig = plt.figure()
+    fig.add_subplot(111)
+
+    scale = max(x_r_rotated) - min(x_r_rotated)
+
+    x_r_rotated = (x_r_rotated - min(x_r_rotated))/scale
+    x_l_rotated = (x_l_rotated - min(x_l_rotated))/scale
+
+    y_r_rotated = y_r_rotated/scale
+    y_l_rotated = y_l_rotated/scale
+
+    plt.scatter(x_r_rotated, y_r_rotated, s=100, color='r', marker='.', label="Upper edge")
+    plt.scatter(x_l_rotated, y_l_rotated, s=100, color='c', marker='.', label="Lower edge") 
+
+    plt.xlabel('X (mm)', fontsize=15)
+    plt.ylabel('Y (mm)', fontsize=15)
+
+    plt.title("X-foil input points at " + str(position) + "% from hub", fontsize = 30)
+    plt.axis([-0.15, 1.15, -0.25, 0.25])
+    plt.legend(loc=2, prop={'size':20})
+    plt.show()
+    fig.savefig('Image/' + str(position) + '_scaled.png')

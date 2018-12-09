@@ -309,8 +309,15 @@ def get_all_projections(planes, all_planes_points):
 
 def generate_points(right_popt, right_points, left_popt, left_points):  #generate for X-foil
     _, highest, lowest = extreme_points(right_points)
-    x = np.linspace(lowest[0], highest[0], 100)
+    a = np.linspace(lowest[0], highest[0], 16)
+    range_x = highest[0] - lowest[0]
 
+    b = np.linspace(lowest[0] + 0.01,        lowest[0] + range_x/10, 5)
+    c = np.linspace(lowest[0] + range_x*0.9, highest[0] - 0.01     , 5)
+
+    x = np.sort(np.hstack((a, b, c)))
+
+    print(x)
     if(type(right_popt) == int or type(left_popt) == int):
         #print("Plane does not have enough points for interpolation")
         return -1, -1, -1
