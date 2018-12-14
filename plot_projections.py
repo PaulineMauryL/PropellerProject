@@ -181,26 +181,26 @@ def plot_interpolation_side_with_points(popt, up_right_points, title):
  #   return a*data[:]**3 + b*data[:]**2 + c*data[:] + d
 
 def plot_interpolation_both_sides_no_generation(right_popt, right_points, left_popt, left_points):      
-
+###################################################ici
     fig = plt.figure()
     fig.add_subplot(111)
 
     data_right = right_points.values[:,0]
     y_right = func_4(data_right, *right_popt)
     plt.plot(data_right, y_right, 'r', linewidth=8, alpha=1, label = "Interpolated curve (upper edge)")
-    plt.scatter(right_points["X"], right_points["Y"], s= 220, color='g', marker='*', label="Real points (upper edge)")
+    plt.scatter(right_points["X"], right_points["Y"], s= 280, color='b', marker='*', label="Real points (upper edge)")
 
 
     data_left = left_points.values[:,0]
     y_left = func_4(data_left, *left_popt)
     plt.plot(data_left, y_left, 'c', linewidth=8, alpha=1, label = "Interpolated curve (lower edge)")
-    plt.scatter(left_points["X"], left_points["Y"],  s=220, color='m', marker='*', label="Real points (lower edge)")
+    plt.scatter(left_points["X"], left_points["Y"],  s=280, color='g', marker='*', label="Real points (lower edge)")
 
     plt.xlabel('X (mm)', fontsize=20)
     plt.ylabel('Y (mm)', fontsize=20)
 
-    plt.title("Aerofoil interpolation", fontsize=30)
-    plt.legend(loc=2, prop={'size':20})
+    plt.title("Aerofoil curve interpolation", fontsize=50)
+    plt.legend(loc=2, prop={'size':30})
     plt.axis([-25, 15, -6, 6])
     plt.show()
     #fig.savefig('Image/' + title + '.png')
@@ -208,8 +208,8 @@ def plot_interpolation_both_sides_no_generation(right_popt, right_points, left_p
 
 
 
-def plot_interpolation_both_sides(right_points, left_points, x, y_right, y_left, i, title):      
-
+def plot_interpolation_both_sides(right_points, left_points, x, y_right, y_left, i):      
+###################################################ici
     fig = plt.figure()
     fig.add_subplot(111)
 
@@ -217,13 +217,13 @@ def plot_interpolation_both_sides(right_points, left_points, x, y_right, y_left,
     plt.scatter(right_points["X"], right_points["Y"], s=170, color='g', marker='^', label="Real points (upper edge)")
 
     plt.scatter(x, y_left,  s=170, color='c', marker='.', label="Generated points (lower edge)")    
-    plt.scatter(left_points["X"], left_points["Y"],  s=170, color='m', marker='^', label="Real points (lower edge)")
+    plt.scatter(left_points["X"], left_points["Y"],  s=170, color='b', marker='^', label="Real points (lower edge)")
 
 
     plt.xlabel('X (mm)', fontsize=15)
     plt.ylabel('Y (mm)', fontsize=15)
 
-    plt.title(title, fontsize = 30)
+    plt.title("Points generated on curve", fontsize = 30)
     plt.axis([-25, 15, -6, 6])
     plt.legend(loc=2, prop={'size':20})
     plt.show()
@@ -238,21 +238,21 @@ def plot_least_squares_latex(right_points, left_points, x, y):
     fig.add_subplot(111)
 
     #plt.scatter(x, y_right)
-    plt.scatter(right_points["X"], right_points["Y"], color='g', label ="Upper edge")
+    plt.scatter(right_points["X"], right_points["Y"],  s=150, color='g', label ="Upper edge")
 
     #plt.scatter(x, y_left)
-    plt.scatter(left_points["X"], left_points["Y"], color='b', label ="Lower edge")
+    plt.scatter(left_points["X"], left_points["Y"],  s=150, color='b', label ="Lower edge")
 
-    plt.plot(x, y, 'r', markersize=10, alpha=1, label = "Separation plane")
+    plt.plot(x, y, 'r', markersize=20, alpha=0.9, linewidth=4, label = "Separation plane")
 
     plt.xlabel('X (mm)', fontsize=20)
     plt.ylabel('Y (mm)', fontsize=20)
 
     plt.title("Least square separation", fontsize=30)
-    plt.legend(loc=0, prop={'size':20})
+    plt.legend(loc=2, prop={'size':30})
     plt.axis([-25, 15, -6, 6])
     plt.show()
-    #fig.savefig('Image/' + title + '.png')
+    fig.savefig('separation.png')
 
 
 

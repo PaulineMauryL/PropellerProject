@@ -5,7 +5,14 @@ from myMathFunction import distance_p2p, normalize_vec, func_4_scalar
 from prop_info import extreme_points, get_principal_direction
 from plot_param import *
 
+#how far is the aerofoil from the center of the propeller
+def get_radius(positions, tip_radius):
+    radius = []
 
+    for pos in positions:
+        radius.append( pos/100*tip_radius ) 
+
+    return radius
 
 ######################################################################################
 #################################    CHORD LENGTH   ##################################
@@ -164,7 +171,7 @@ def param_mean_error(real, theory):
 def param_RMSE(real, theory):
 	error = 0
 	for r, t in zip(real, theory):
-		error = error + (r - t)*(r - t)
+		error = error + math.sqrt((r - t)*(r - t))
 	error = error/len(real)
 	return error
 

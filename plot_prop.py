@@ -41,7 +41,7 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	downlim, uplim = findMinMaxDF(propeller_coords)
 
 	mp, = ax.plot([np.mean(propeller_coords["X"])], [np.mean(propeller_coords["Y"])], [np.mean(propeller_coords["Z"])],
-	        '*', markersize=15, color='red', alpha=1, label = "Middle point")
+	        '*', markersize=20, color='red', alpha=1, label = "Middle point")
 
 	a = Arrow3D([np.mean(propeller_coords["X"]), np.mean(propeller_coords["X"]) + vect_blade[0]], 
             [np.mean(propeller_coords["Y"]), np.mean(propeller_coords["Y"]) + vect_blade[1]], 
@@ -58,7 +58,7 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	c = Arrow3D([np.mean(propeller_coords["X"]), np.mean(propeller_coords["X"]) + vect_side[0]], 
             [np.mean(propeller_coords["Y"]), np.mean(propeller_coords["Y"]) + vect_side[1]], 
             [np.mean(propeller_coords["Z"]), np.mean(propeller_coords["Z"]) + vect_side[2]], 
-            mutation_scale=20, lw=5, arrowstyle="-|>", color="cyan")
+            mutation_scale=20, lw=5, arrowstyle="-|>", color="red")
 	ax.add_artist(c)		
 
 	# Define an arbitrary legend handle with a proxy:
@@ -67,7 +67,7 @@ def plot_direction(propeller_coords, vect_blade, vect_out, vect_side):
 	# Generate the legend:
 	handles = [pc, mp, a, b, c]
 	labels = ["Point cloud", "Middle point", "n", "v", "w"]
-	ax.legend(handles, labels, loc=0, prop={'size': 20})
+	ax.legend(handles, labels, loc=4, prop={'size': 25})
 
 	#plt.axes().set_aspect('equal')
 	ax.set_xlabel('X (mm)', fontsize=20)

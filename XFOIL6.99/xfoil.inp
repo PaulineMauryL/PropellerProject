@@ -1,0 +1,18 @@
+load C:\Users\Pauli\Desktop\PropellerProject\XFOIL6.99\xfoil.foil
+
+
+oper
+re 1e+06
+mach 0.2
+visc
+pacc
+
+
+alfa 10
+dump xfoil_a10.000_dump.dat
+cpwr xfoil_a10.000_cpwr.dat
+pwrt
+xfoil_pwrt.dat
+plis
+
+quit

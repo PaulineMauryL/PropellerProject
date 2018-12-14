@@ -195,3 +195,51 @@ def get_segments(blade, planes, nb_seg):
     segments["points"].append(blade.loc[index_segment].copy().as_matrix())
 
     return segments
+
+def xfoil_input_data(x_r, y_right, x_l, y_left, position):
+    #fichier avec x et y dans l'ordre puis x et y_left reversed
+    length = len(x_r)
+    scale = max(max(x_r) - min(x_r), max(x_l) - min(x_l))
+
+    right = np.zeros([length, 2])    
+    right[:, 0] = x_r - min(x_r)
+    right[:, 1] = y_right
+    right = right/scale
+    #right[0,1] = 0
+    right[length-1, 0] = 1
+    if(right[length-2,0] >= 1):
+        print("nop_r1")
+        right = np.delete(right,(length-2), axis=0)
+        
+    if(right[0,0]>right[1, 0]):
+        #delete 1,0
+        print("nop_r2")
+        right = np.delete(right,(1), axis=0)
+    
+    print(right)
+    print("\n")
+
+    left  = np.zeros([length, 2])
+    left[:, 0] = x_l[::-1] - min(x_l)
+    left[:, 1] = y_left[::-1]
+    left = left/scale
+    left[0, 0] = 1
+    left[length-1,0] = 0
+    
+    if(left[length-2,0] <= 0):
+        print("nop_l1")
+        left = np.delete(left,(length-2), axis=0)
+        
+    if(left[0,0]<left[1, 0]):
+        #delete 1,0
+        print("nop_l2")
+        left = np.delete(left,(1), axis=0)
+
+    print(left)
+    print("\n")
+    
+    xy = np.vstack((right, left))
+    #print(xy)
+    filename = "XFOIL6.99/xfoil" + str(position) + ".txt"
+
+    np.savetxt(filename, xy)

@@ -94,47 +94,32 @@ def get_generated_points_xfoil(right_param, left_param, right_pts, left_pts):
     return x_list, y_right_list, y_left_list, len(removed)
 
 
-def plot_xfoil(x, y_right, y_left, position):      
-
-    fig = plt.figure()
-    fig.add_subplot(111)
-
-    plt.scatter(x, y_right, s=170, color='r', marker='.', label="Upper edge")
-    plt.scatter(x, y_left,  s=170, color='c', marker='.', label="Lower edge") 
-
-    plt.xlabel('X (mm)', fontsize=15)
-    plt.ylabel('Y (mm)', fontsize=15)
-
-    plt.title("X-foil input points at " + str(position) + "% from hub", fontsize = 30)
-    plt.axis([-20, 20, -8, 8])
-    plt.legend(loc=2, prop={'size':20})
-    plt.show()
-    #fig.savefig('Image/' + title + '.png')
 
 
-
+# This contains only the X,Y coordinates, which run from the trailing edge, round the leading edge, 
+# back to the trailing edge in either direction
 def xfoil_input_data(x_r, y_right, x_l, y_left, position):
     #fichier avec x et y dans l'ordre puis x et y_left reversed
     length = len(x_r)
-    scale = max(x_r) - min(x_r)
-
+    #scale = max(max(x_r) - min(x_r), max(x_l) - min(x_l))
+    #print(x_r[::-1])
     right = np.zeros([length, 2])    
-    right[:, 0] = x_r - min(x_r)
-    right[:, 1] = y_right
-    right = right/scale
-    #right[0,1] = 0
-    #right[length-1, 1] = 0
+    right[:, 0] = x_r [::-1]
+    right[:, 1] = y_right[::-1]
+    
+    #print(right)
+    #print("\n")
 
     left  = np.zeros([length, 2])
-    left[:, 0] = x_l[::-1] - min(x_l)
-    left[:, 1] = y_left[::-1]
-    left = left/scale
-    #left[0, 1] = 0
-    #left[length-1,1] = 0
+    left[:, 0] = x_l
+    left[:, 1] = y_left
 
+    #print(left)
+    #print("\n")
+    
     xy = np.vstack((right, left))
-    print(xy)
-    filename = "XFOIL6.99/xfoil" + str(position) + ".txt"
+    #print(xy)
+    filename = "XFOIL6.99/xfoil" + str(position) + "2.txt"
 
     np.savetxt(filename, xy)
 
@@ -161,6 +146,23 @@ def xfoil_get_blade_twist(x, y_right_list, y_left_list):
 
 	return blade_twist
 '''
+def plot_xfoil(x, y_right, y_left, position):      
+
+    fig = plt.figure()
+    fig.add_subplot(111)
+
+    plt.scatter(x, y_right, s=170, color='b', marker='.', label="Upper edge")
+    plt.scatter(x, y_left,  s=170, color='g', marker='.', label="Lower edge") 
+
+    plt.xlabel('X (mm)', fontsize=15)
+    plt.ylabel('Y (mm)', fontsize=15)
+
+    plt.title("Computed points (" + str(position) + "% r/R)", fontsize = 30)
+    plt.axis([-20, 15, -8, 8])
+    plt.legend(loc=2, prop={'size':20})
+    plt.show()
+    fig.savefig('Image/xfoil/' + str(position) + '_computed.png')
+
 
 def align_aerofoil(x_list, y_right_list, y_left_list, blade_twist):
 	 #Align aerofoil such that blade twîst = 0
@@ -189,22 +191,78 @@ def align_aerofoil(x_list, y_right_list, y_left_list, blade_twist):
 	return x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated
 
 
+def mirror_aerofoil(y_r_rotated, y_l_rotated):
+    y_r_flipped = [-x for x in y_r_rotated]
+    y_l_flipped = [-x for x in y_l_rotated]
+    
+    return y_r_flipped, y_l_flipped
+
+
+def reynold_number(radius, rpm, chord_length):
+    kinematic_viscosity = 14.88 * math.pow(10,-6) #[m^2/s]  https://www.engineeringtoolbox.com/air-absolute-kinematic-viscosity-d_601.html at 18°
+    kinematic_viscosity = kinematic_viscosity*60*math.pow(10,6)   # *60 -> [m^2/min]  *10^6 -> [mm^2/min]
+    u = radius * rpm  #[mm] * [/min] 
+    reynold = (u * chord_length)/kinematic_viscosity    # [mm/min] * [mm] / [mm^2/min] -> [X]
+    return reynold
+
+def get_reynold_numbers(radius, rpm, chord_length):
+    reynold = []
+    for rad, cl in zip(radius, chord_length):
+        reynold.append( reynold_number(rad, rpm, cl) )
+    return reynold
+
+def mach_number(radius, rpm):  
+    c =  20580000 #v_sound = 343[m/s] = 343*60[m/min] = 343*60*1000 [mm/min]
+    u = radius * rpm  #[mm] * [/min] 
+    mach = u/c     # [min/mmm] / [mm/min] -> [X]
+    return mach
+
+def get_mach_numbers(radius, rpm):
+    mach = []
+    for rad in radius:
+        mach.append( mach_number(rad, rpm) )
+    return mach
+
+def output_reynold_mach(positions, radius, reynold, mach, filename):
+    df = pd.DataFrame({'Percentage': positions, 'Radius': radius,  'Reynold': reynold, 'Mach':mach})
+    df.to_csv(filename)
+    return df
+    
+
 def plot_xfoil_aligned(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, position):      
 
     fig = plt.figure()
     fig.add_subplot(111)
 
-    plt.scatter(x_r_rotated, y_r_rotated, s=170, color='r', marker='.', label="Upper edge")
-    plt.scatter(x_l_rotated, y_l_rotated,  s=170, color='c', marker='.', label="Lower edge") 
+    plt.scatter(x_r_rotated, y_r_rotated, s=170, color='b', marker='.', label="Upper edge")
+    plt.scatter(x_l_rotated, y_l_rotated,  s=170, color='g', marker='.', label="Lower edge") 
 
     plt.xlabel('X (mm)', fontsize=15)
     plt.ylabel('Y (mm)', fontsize=15)
 
-    plt.title("X-foil input points at " + str(position) + "% from hub", fontsize = 30)
-    plt.axis([-20, 20, -8, 8])
+    plt.title("Aligned points (" + str(position) + "% r/R)", fontsize = 30)
+    plt.axis([-20, 15, -8, 8])
     plt.legend(loc=2, prop={'size':20})
     plt.show()
-    fig.savefig('Image/' + str(position) + '_raw.png')
+    fig.savefig('Image/xfoil/' + str(position) + '_align.png')
+
+def plot_xfoil_mirror(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, position):      
+
+    fig = plt.figure()
+    fig.add_subplot(111)
+
+    plt.scatter(x_r_rotated, y_r_rotated, s=170, color='b', marker='.', label="Upper edge")
+    plt.scatter(x_l_rotated, y_l_rotated,  s=170, color='g', marker='.', label="Lower edge") 
+
+    plt.xlabel('X (mm)', fontsize=15)
+    plt.ylabel('Y (mm)', fontsize=15)
+
+    plt.title("Mirrored (" + str(position) + "% r/R)", fontsize = 30)
+    plt.axis([-20, 15, -8, 8])
+    plt.legend(loc=2, prop={'size':20})
+    plt.show()
+    fig.savefig('Image/xfoil/' + str(position) + '_mirror.png')
+
 
 
 def plot_xfoil_scaled(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, position):      
@@ -220,13 +278,13 @@ def plot_xfoil_scaled(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, positi
     y_r_rotated = y_r_rotated/scale
     y_l_rotated = y_l_rotated/scale
 
-    plt.scatter(x_r_rotated, y_r_rotated, s=100, color='r', marker='.', label="Upper edge")
-    plt.scatter(x_l_rotated, y_l_rotated, s=100, color='c', marker='.', label="Lower edge") 
+    plt.scatter(x_r_rotated, y_r_rotated, s=100, color='b', marker='.', label="Upper edge")
+    plt.scatter(x_l_rotated, y_l_rotated, s=100, color='g', marker='.', label="Lower edge") 
 
     plt.xlabel('X (mm)', fontsize=15)
     plt.ylabel('Y (mm)', fontsize=15)
 
-    plt.title("X-foil input points at " + str(position) + "% from hub", fontsize = 30)
+    plt.title("X-foil input points  (" + str(position) + "% r/R)", fontsize = 30)
     plt.axis([-0.15, 1.15, -0.25, 0.25])
     plt.legend(loc=2, prop={'size':20})
     plt.show()
