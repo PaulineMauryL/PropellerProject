@@ -12,21 +12,21 @@ import pandas as pd
 def plot_hub(propeller_coords, hub_points, point_outer_radius, point_inner_radius):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection = '3d')
-    ax.scatter(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], s=1, c='k', label = "Point cloud")
+    ax.scatter(propeller_coords["X"], propeller_coords["Y"], propeller_coords["Z"], s=10, c='k', label = "Point cloud")
     
-    ax.scatter(hub_points["X"], hub_points["Y"], hub_points["Z"], s=20, c='g', label = "Selected points")
+    ax.scatter(hub_points["X"], hub_points["Y"], hub_points["Z"], s=70, c='g', label = "Selected points")
 
-    ax.scatter(point_outer_radius[0], point_outer_radius[1], point_outer_radius[2], s=50, c='r', label= "Outer radius")
-    ax.scatter(point_inner_radius[0], point_inner_radius[1], point_inner_radius[2], s=50, c='r', label= "Inner radius")
+    ax.scatter(point_outer_radius[0], point_outer_radius[1], point_outer_radius[2], s=350, c='r', label= "Outer radius")
+    ax.scatter(point_inner_radius[0], point_inner_radius[1], point_inner_radius[2], s=350, c='b', label= "Inner radius")
     downlim, uplim = findMinMaxDF(propeller_coords)
 
     ax.set_xlabel('X (mm)', fontsize=20)
     ax.set_ylabel('Y (mm)', fontsize=20)
     ax.set_zlabel('Z (mm)', fontsize=20)
     
-    ax.set_xlim([downlim, uplim]);
-    ax.set_ylim([downlim, uplim]);
-    ax.set_zlim([downlim, uplim]);
+    ax.set_xlim([-20, 20]);
+    ax.set_ylim([-20, 20]);
+    ax.set_zlim([-20, 20]);
     
     plt.legend(loc=0, prop={'size':20})
     plt.title('Hub radius', fontsize=30)

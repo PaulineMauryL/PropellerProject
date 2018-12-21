@@ -77,7 +77,7 @@ def get_tip_radius(propeller_coords):  # say in report that mean with lowest
 ######################################################################################
 
 def get_hub_points(propeller_coords, dmiddle, vect_length):
-    size = 4
+    size = 1
     plane = np.append(vect_length, dmiddle)
     upper_plane = plane[:] + [0,0,0,size]
     lower_plane = plane[:] - [0,0,0,size]
@@ -153,6 +153,9 @@ def param_hub_radius(propeller_coords):
 	outer_point, inner_point = get_hub_radius(hub_points, middle_point, hub_inner_radius, vect_side)
 	hub_radius_width = distance_p2p(outer_point, inner_point)
 	hub_radius = distance_p2p(middle_point, outer_point)
+
+	plot_hub(propeller_coords, hub_points, outer_point, inner_point)
+
 	return hub_radius
 
 ######################################################################################

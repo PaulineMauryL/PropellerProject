@@ -98,32 +98,54 @@ def get_generated_points_xfoil(right_param, left_param, right_pts, left_pts):
 
 # This contains only the X,Y coordinates, which run from the trailing edge, round the leading edge, 
 # back to the trailing edge in either direction
-def xfoil_input_data(x_r, y_right, x_l, y_left, position):
+def xfoil_input_data(x_r_rotated, y_r_flipped, x_l_rotated, y_l_flipped, position):
+	#peut etre y et x dans autre sens comme on a mirror
+
     #fichier avec x et y dans l'ordre puis x et y_left reversed
-    length = len(x_r)
-    #scale = max(max(x_r) - min(x_r), max(x_l) - min(x_l))
+    length = len(x_r_rotated)
+    scale = max(max(x_r_rotated) - min(x_r_rotated), max(x_l_rotated) - min(x_l_rotated))
     #print(x_r[::-1])
     right = np.zeros([length, 2])    
-    right[:, 0] = x_r [::-1]
-    right[:, 1] = y_right[::-1]
-    
+    right[:, 0] = ((x_l_rotated - min(x_l_rotated))/scale)[::-1]
+    right[:, 1] = (y_l_flipped/scale)[::-1]    
     #print(right)
     #print("\n")
 
     left  = np.zeros([length, 2])
-    left[:, 0] = x_l
-    left[:, 1] = y_left
-
+    left[:, 0] = (x_r_rotated - min(x_r_rotated))/scale
+    left[:, 1] = y_r_flipped/scale
     #print(left)
-    #print("\n")
-    
+    #print("\n")    
     xy = np.vstack((right, left))
     #print(xy)
-    filename = "XFOIL6.99/xfoil" + str(position) + "2.txt"
+    filename = "XFOIL6.99/xf" + str(position) + "_r.txt"
 
     np.savetxt(filename, xy)
 
+def plot_xfoil_scaled(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, position):      
 
+    fig = plt.figure()
+    fig.add_subplot(111)
+
+    scale = max(x_r_rotated) - min(x_r_rotated)
+
+    x_r_rotated = (x_r_rotated - min(x_r_rotated))/scale
+    x_l_rotated = (x_l_rotated - min(x_l_rotated))/scale
+
+    y_r_rotated = y_r_rotated/scale
+    y_l_rotated = y_l_rotated/scale
+
+    plt.scatter(x_r_rotated, y_r_rotated, s=100, color='b', marker='.', label="Upper edge")
+    plt.scatter(x_l_rotated, y_l_rotated, s=100, color='g', marker='.', label="Lower edge") 
+
+    plt.xlabel('X (mm)', fontsize=15)
+    plt.ylabel('Y (mm)', fontsize=15)
+
+    plt.title("X-foil input points  (" + str(position) + "% r/R)", fontsize = 30)
+    plt.axis([-0.15, 1.15, -0.25, 0.25])
+    plt.legend(loc=2, prop={'size':20})
+    plt.show()
+    fig.savefig('Image/' + str(position) + '_scaled.png')
 '''
 def xfoil_get_blade_twist(x, y_right_list, y_left_list):
 	blade_twist = []
@@ -265,27 +287,3 @@ def plot_xfoil_mirror(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, positi
 
 
 
-def plot_xfoil_scaled(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, position):      
-
-    fig = plt.figure()
-    fig.add_subplot(111)
-
-    scale = max(x_r_rotated) - min(x_r_rotated)
-
-    x_r_rotated = (x_r_rotated - min(x_r_rotated))/scale
-    x_l_rotated = (x_l_rotated - min(x_l_rotated))/scale
-
-    y_r_rotated = y_r_rotated/scale
-    y_l_rotated = y_l_rotated/scale
-
-    plt.scatter(x_r_rotated, y_r_rotated, s=100, color='b', marker='.', label="Upper edge")
-    plt.scatter(x_l_rotated, y_l_rotated, s=100, color='g', marker='.', label="Lower edge") 
-
-    plt.xlabel('X (mm)', fontsize=15)
-    plt.ylabel('Y (mm)', fontsize=15)
-
-    plt.title("X-foil input points  (" + str(position) + "% r/R)", fontsize = 30)
-    plt.axis([-0.15, 1.15, -0.25, 0.25])
-    plt.legend(loc=2, prop={'size':20})
-    plt.show()
-    fig.savefig('Image/' + str(position) + '_scaled.png')

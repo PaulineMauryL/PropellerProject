@@ -348,6 +348,8 @@ def get_generated_points(right_param, left_param, right_pts, left_pts, delta_d):
 
     delta_d = abs(delta_d)
     delta_tot = 0
+    print("here")
+    plot_interpolation_both_sides_no_generation(right_param[1], right_pts[1], left_param[1], left_pts[1])
 
     for i in range(len(right_param)):
         x, y_right, y_left = generate_points(right_param[i], right_pts[i], left_param[i], left_pts[i])
@@ -370,3 +372,5 @@ def get_generated_points(right_param, left_param, right_pts, left_pts, delta_d):
             left.append(left_pts[i])
             
     return x_list, y_right_list, y_left_list, right, left, position, len(removed)
+
+
