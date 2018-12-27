@@ -212,8 +212,8 @@ def interpolate_points(up1):
 #################################################################################################################
 def add_border_points(right_points, left_points):     #report for contuity
     #add extreme points to have same extremity on both sides
-    print(len(right_points))
-    print(len(left_points))
+    #print(len(right_points))
+    #print(len(left_points))
     
     _, high_right, low_right = extreme_points(right_points)
     _, high_left,  low_left  = extreme_points(left_points)
@@ -309,8 +309,18 @@ def get_all_projections(planes, all_planes_points):
 
 def generate_points(right_popt, right_points, left_popt, left_points):  #generate for X-foil
     _, highest, lowest = extreme_points(right_points)
-    x = np.linspace(lowest[0], highest[0], 100)
+    
+    a = np.linspace(lowest[0], highest[0], 16)
+    range_x = highest[0] - lowest[0]
 
+    b = np.linspace(lowest[0] + 0.01,        lowest[0] + range_x/10, 5)
+    c = np.linspace(lowest[0] + range_x*0.9, highest[0] - 0.01     , 5)
+
+    x = np.sort(np.hstack((a, b, c)))
+    
+    #x = np.linspace(lowest[0], highest[0], 100)
+
+    #print(x)
     if(type(right_popt) == int or type(left_popt) == int):
         #print("Plane does not have enough points for interpolation")
         return -1, -1, -1
@@ -338,6 +348,8 @@ def get_generated_points(right_param, left_param, right_pts, left_pts, delta_d):
 
     delta_d = abs(delta_d)
     delta_tot = 0
+    print("here")
+    plot_interpolation_both_sides_no_generation(right_param[1], right_pts[1], left_param[1], left_pts[1])
 
     for i in range(len(right_param)):
         x, y_right, y_left = generate_points(right_param[i], right_pts[i], left_param[i], left_pts[i])
@@ -360,3 +372,5 @@ def get_generated_points(right_param, left_param, right_pts, left_pts, delta_d):
             left.append(left_pts[i])
             
     return x_list, y_right_list, y_left_list, right, left, position, len(removed)
+
+

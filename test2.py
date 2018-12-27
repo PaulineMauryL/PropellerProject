@@ -15,7 +15,7 @@ propeller = pd.read_csv('propeller_data.csv')
 
 ''' Choose number of aerofoil wanted
 '''
-nb_seg = 10
+nb_seg = 2
 
 
 

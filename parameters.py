@@ -5,7 +5,14 @@ from myMathFunction import distance_p2p, normalize_vec, func_4_scalar
 from prop_info import extreme_points, get_principal_direction
 from plot_param import *
 
+#how far is the aerofoil from the center of the propeller
+def get_radius(positions, tip_radius):
+    radius = []
 
+    for pos in positions:
+        radius.append( pos/100*tip_radius ) 
+
+    return radius
 
 ######################################################################################
 #################################    CHORD LENGTH   ##################################
@@ -70,7 +77,7 @@ def get_tip_radius(propeller_coords):  # say in report that mean with lowest
 ######################################################################################
 
 def get_hub_points(propeller_coords, dmiddle, vect_length):
-    size = 4
+    size = 1
     plane = np.append(vect_length, dmiddle)
     upper_plane = plane[:] + [0,0,0,size]
     lower_plane = plane[:] - [0,0,0,size]
@@ -135,12 +142,39 @@ def get_hub_radius(hub, middle_point, hub_inner_radius, vect_side):
 
 
 def param_hub_radius(propeller_coords):
+
 	middle_point, _, _ = extreme_points(propeller_coords)
 	vect_length, _, vect_side = get_principal_direction(propeller_coords)   #main directions
 	dmiddle     = - middle_point @ vect_length
+
 	hub_points  = get_hub_points(propeller_coords, dmiddle, vect_length)
+	
 	hub_inner_radius = get_hub_inner_radius(propeller_coords, vect_length)
 	outer_point, inner_point = get_hub_radius(hub_points, middle_point, hub_inner_radius, vect_side)
 	hub_radius_width = distance_p2p(outer_point, inner_point)
 	hub_radius = distance_p2p(middle_point, outer_point)
+
+	plot_hub(propeller_coords, hub_points, outer_point, inner_point)
+
 	return hub_radius
+
+######################################################################################
+#############################     RESULT COMPARISON    ###############################
+######################################################################################
+
+def param_mean_error(real, theory):
+	error = 0
+	for r, t in zip(real, theory):
+		error = error + abs(r - t)
+	error = error/len(real)
+	return error
+
+
+
+def param_RMSE(real, theory):
+	error = 0
+	for r, t in zip(real, theory):
+		error = error + math.sqrt((r - t)*(r - t))
+	error = error/len(real)
+	return error
+
