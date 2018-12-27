@@ -279,11 +279,11 @@ def plot_xfoil_mirror(x_r_rotated, y_r_rotated, x_l_rotated, y_l_rotated, positi
     plt.xlabel('X (mm)', fontsize=15)
     plt.ylabel('Y (mm)', fontsize=15)
 
-    plt.title("Mirrored (" + str(position) + "% r/R)", fontsize = 30)
+    plt.title("X-Foil input (" + str(position) + "% r/R)", fontsize = 30)
     plt.axis([-20, 15, -8, 8])
     plt.legend(loc=2, prop={'size':20})
     plt.show()
-    fig.savefig('Image/xfoil/' + str(position) + '_mirror.png')
+    fig.savefig('Image/xfoil/' + str(position) + '_input.png')
 
 
 
