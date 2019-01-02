@@ -2,8 +2,7 @@ import pandas as pd
 import numpy as np
 import math
 from myMathFunction import distance_p2p, normalize_vec, func_4_scalar
-from prop_info import extreme_points, get_principal_direction
-from plot_param import *
+from preprocessing import extreme_points, get_principal_direction
 
 #how far is the aerofoil from the center of the propeller
 def get_radius(positions, tip_radius):
@@ -154,7 +153,7 @@ def param_hub_radius(propeller_coords):
 	hub_radius_width = distance_p2p(outer_point, inner_point)
 	hub_radius = distance_p2p(middle_point, outer_point)
 
-	plot_hub(propeller_coords, hub_points, outer_point, inner_point)
+	#plot_hub(propeller_coords, hub_points, outer_point, inner_point)
 
 	return hub_radius
 
@@ -178,3 +177,12 @@ def param_RMSE(real, theory):
 	error = error/len(real)
 	return error
 
+######################################################################################
+#############################           OUTPUT         ###############################
+######################################################################################
+
+def output_param(positions, tip_radius, hub_radius, chord_length_normalized, blade_twist, filename):
+    df = pd.DataFrame({'Percentage': positions, 'Chord_Length': chord_length_normalized,  'Blade_twist': blade_twist, 
+    											'Hub_radius': hub_radius, 'Tip_radius': tip_radius})
+    df.to_csv(filename)
+    return df
