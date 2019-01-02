@@ -10,7 +10,7 @@ The file propeller_information imports its functions from:
 - aerodynamic_parameters.py to compute the Reynolds and Mach numbers, 
 - xfoil_output.py to output the .txt file in the right shape for the X-foil software
 
-INPUTS -- when launched, the algorithm asks the following inputs
+## INPUTS -- when launched, the algorithm asks the following inputs
 
 - 'Enter your stl file name (without .stl): '
 The user should give as input the name of the stl file (ex: propeller)
@@ -31,7 +31,7 @@ The user should enter 1 if he/she wants to see the plots with the aerofoils and 
 And enter 0 otherwise.
 
 
-OUTPUTS -- depending on the inputs, the algorithm returns in the 'output' folder
+## OUTPUTS -- depending on the inputs, the algorithm returns in the 'output' folder
 
 - aerofoil_XX_.txt   (with XX being the position r/R)
 For each position of aerofoil given, the algorithm outputs the aerofoil points in the right order for xfoil.
